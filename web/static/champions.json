@@ -49,7 +49,7 @@
         "title": "the Rogue Assassin",
         "resource": "Energy",
         "genre": "Assassin",
-        "skinCount": 101,
+        "skinCount": 102,
         "image": {
             "full": "Akali.png",
             "sprite": "champion0.png",
@@ -1523,7 +1523,7 @@
         "title": "the Deceiver",
         "resource": "Mana",
         "genre": "Assassin,Mage",
-        "skinCount": 61,
+        "skinCount": 62,
         "image": {
             "full": "Leblanc.png",
             "sprite": "champion2.png",
@@ -2137,7 +2137,7 @@
         "title": "the Lady of Clockwork",
         "resource": "Mana",
         "genre": "Mage,Support",
-        "skinCount": 40,
+        "skinCount": 43,
         "image": {
             "full": "Orianna.png",
             "sprite": "champion3.png",
@@ -2929,7 +2929,7 @@
         "title": "the Stoneweaver",
         "resource": "Mana",
         "genre": "Mage,Support",
-        "skinCount": 25,
+        "skinCount": 26,
         "image": {
             "full": "Taliyah.png",
             "sprite": "champion4.png",
@@ -3039,7 +3039,7 @@
         "title": "the Yordle Gunner",
         "resource": "Mana",
         "genre": "Marksman,Assassin",
-        "skinCount": 79,
+        "skinCount": 81,
         "image": {
             "full": "Tristana.png",
             "sprite": "champion4.png",
