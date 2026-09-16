@@ -38,7 +38,7 @@ describe("loadChampions", () => {
   it("fetches the static champions file and returns the parsed list", async () => {
     const { mod, fetchMock } = await freshModule();
     await expect(mod.loadChampions()).resolves.toEqual(CHAMPIONS);
-    expect(fetchMock).toHaveBeenCalledWith("/champions.json");
+    expect(fetchMock).toHaveBeenCalledWith("/campaigns.json");
   });
 
   it("serves later calls from the cache without refetching", async () => {
