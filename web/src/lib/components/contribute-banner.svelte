@@ -44,9 +44,13 @@
     <!--
       An anchor rather than a button that navigates: it keeps middle-click,
       right-click → copier l'adresse, and the right screen-reader announcement.
+
+      The href is a mailto:, not a route, so there is nothing for resolve() to
+      resolve — and it is built at runtime, so the rule cannot see that for
+      itself and assumes the worst.
     -->
-    <a
-      {href}
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+    <a {href}
       onclick={() => (showFallback = true)}
       class="inline-block px-5 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-text)] font-semibold no-underline cursor-pointer transition-opacity hover:opacity-85"
     >
