@@ -13,7 +13,10 @@
   --color-input-bg: #0f3460;
   --color-input-border: #533483;
   --color-accent: #533483;
-  --cell-size: 90px;
+  /* Sized for the longest game names ("Vampire : La Mascarade"). */
+  --cell-size: 100px;
+  /* Campaign names run long — "L'Héritage des Sept Tours" needs the room. */
+  --name-col: 180px;
 }
 
 body {
@@ -26,7 +29,13 @@ body {
 /* Guess grid layout */
 .guess-row {
   display: grid;
-  grid-template-columns: 130px repeat(7, var(--cell-size));
+  /* --attr-count is set by guess-grid.svelte from CLASSIC_ATTRIBUTES.length, so
+     the column count follows the attribute list instead of being restated here
+     and in each media block. The fallback only matters if that style is lost. */
+  grid-template-columns: var(--name-col) repeat(
+      var(--attr-count, 6),
+      var(--cell-size)
+    );
   gap: 4px;
   margin-bottom: 4px;
   min-width: fit-content;
@@ -62,13 +71,29 @@ body {
   animation: none;
 }
 
-.champion-cell {
+.campaign-cell {
   display: flex;
   align-items: center;
   gap: 8px;
   justify-content: flex-start;
+  text-align: left;
   padding-left: 8px;
   background: var(--color-surface);
+  /* Without this the name refuses to wrap and pushes the grid wider. */
+  min-width: 0;
+}
+
+/* Stand-in for campaigns with no illustration. */
+.campaign-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: var(--color-accent);
+  color: var(--color-text);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
 }
 
 .cell-correct {
@@ -97,13 +122,11 @@ body {
   }
 }
 
-/* Responsive */
+/* Responsive — only the track sizes change; the column count is data-driven. */
 @media (max-width: 768px) {
   :root {
-    --cell-size: 72px;
-  }
-  .guess-row {
-    grid-template-columns: 100px repeat(7, var(--cell-size));
+    --cell-size: 76px;
+    --name-col: 130px;
   }
   .guess-cell {
     font-size: 0.7rem;
@@ -114,9 +137,7 @@ body {
 
 @media (max-width: 480px) {
   :root {
-    --cell-size: 60px;
-  }
-  .guess-row {
-    grid-template-columns: 80px repeat(7, var(--cell-size));
+    --cell-size: 62px;
+    --name-col: 100px;
   }
 }

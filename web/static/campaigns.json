@@ -1,0 +1,182 @@
+[
+  {
+    "campaign": {
+      "value": "La Campagne des Gobelins",
+      "notes": [
+        "Née d'un one-shot d'initiation qui devait durer une seule soirée.",
+        "Le nom vient d'un gobelin PNJ que le groupe a refusé de tuer trois séances de suite."
+      ]
+    },
+    "gm": {
+      "value": "Benjamin",
+      "notes": ["Première campagne longue de Benjamin derrière l'écran."]
+    },
+    "game": { "value": "Pathfinder 2e" },
+    "year": { "value": 2024 },
+    "pj_max": {
+      "value": 6,
+      "notes": ["Six joueurs, ce qui a rendu les combats interminables."]
+    },
+    "duration": { "value": 2 },
+    "deaths": {
+      "value": 3,
+      "notes": ["Deux morts sur le même piège, à deux séances d'intervalle."]
+    }
+  },
+  {
+    "campaign": { "value": "Les Ombres d'Ébène" },
+    "gm": { "value": "Camille" },
+    "game": { "value": "Dungeons & Dragons 5e" },
+    "year": { "value": 2021 },
+    "pj_max": { "value": 5 },
+    "duration": { "value": 3 },
+    "deaths": { "value": 7 }
+  },
+  {
+    "campaign": {
+      "value": "Le Trône de Cendres",
+      "notes": ["La campagne la plus meurtrière de la guilde, tous systèmes confondus."]
+    },
+    "gm": { "value": "Antoine" },
+    "game": { "value": "Warhammer Fantasy" },
+    "year": { "value": 2019 },
+    "pj_max": { "value": 4 },
+    "duration": { "value": 4 },
+    "deaths": {
+      "value": 12,
+      "notes": ["Douze morts pour quatre places : chaque joueur a enterré au moins deux personnages."]
+    }
+  },
+  {
+    "campaign": { "value": "L'Épée Brisée" },
+    "gm": { "value": "Marion" },
+    "game": { "value": "Dungeons & Dragons 5e" },
+    "year": { "value": 2023 },
+    "pj_max": { "value": 5 },
+    "duration": { "value": 1 },
+    "deaths": {
+      "value": 0,
+      "notes": ["Aucun mort : Marion avait annoncé dès la séance zéro qu'elle ne tuerait personne."]
+    }
+  },
+  {
+    "campaign": { "value": "Les Brumes de Valmorte" },
+    "gm": { "value": "Benjamin" },
+    "game": { "value": "L'Appel de Cthulhu" },
+    "year": { "value": 2020 },
+    "pj_max": { "value": 4 },
+    "duration": { "value": 2 },
+    "deaths": { "value": 9 }
+  },
+  {
+    "campaign": { "value": "Le Pacte du Corbeau" },
+    "gm": { "value": "Sophie" },
+    "game": { "value": "Vampire : La Mascarade" },
+    "year": { "value": 2022 },
+    "pj_max": { "value": 5 },
+    "duration": { "value": 3 },
+    "deaths": { "value": 2 }
+  },
+  {
+    "campaign": { "value": "La Route du Sel" },
+    "gm": { "value": "Antoine" },
+    "game": { "value": "Pathfinder 2e" },
+    "year": { "value": 2018 },
+    "pj_max": { "value": 6 },
+    "duration": {
+      "value": 5,
+      "notes": ["Cinq ans de séances bimensuelles, avec une pause d'un an au milieu."]
+    },
+    "deaths": { "value": 4 }
+  },
+  {
+    "campaign": { "value": "Les Enfants de Mars" },
+    "gm": { "value": "Julien" },
+    "game": { "value": "Shadowrun" },
+    "year": { "value": 2025 },
+    "pj_max": { "value": 4 },
+    "duration": { "value": 1 },
+    "deaths": { "value": 1 }
+  },
+  {
+    "campaign": {
+      "value": "L'Héritage des Sept Tours",
+      "notes": ["La plus longue campagne de la guilde avant L'Aube des Six Royaumes."]
+    },
+    "gm": { "value": "Camille" },
+    "game": { "value": "Dungeons & Dragons 5e" },
+    "year": { "value": 2017 },
+    "pj_max": { "value": 7 },
+    "duration": { "value": 6 },
+    "deaths": { "value": 15 }
+  },
+  {
+    "campaign": { "value": "Le Silence de Kaldir" },
+    "gm": { "value": "Marion" },
+    "game": { "value": "Blades in the Dark" },
+    "year": { "value": 2024 },
+    "pj_max": { "value": 4 },
+    "duration": { "value": 1 },
+    "deaths": { "value": 0 }
+  },
+  {
+    "campaign": { "value": "Les Cendres de Novigrad" },
+    "gm": { "value": "Julien" },
+    "game": { "value": "Warhammer Fantasy" },
+    "year": { "value": 2022 },
+    "pj_max": { "value": 5 },
+    "duration": { "value": 2 },
+    "deaths": { "value": 6 }
+  },
+  {
+    "campaign": { "value": "La Marche des Titans" },
+    "gm": { "value": "Sophie" },
+    "game": { "value": "Pathfinder 2e" },
+    "year": { "value": 2016 },
+    "pj_max": { "value": 6 },
+    "duration": { "value": 7 },
+    "deaths": { "value": 11 }
+  },
+  {
+    "campaign": { "value": "Le Dernier Convoi" },
+    "gm": { "value": "Benjamin" },
+    "game": { "value": "Shadowrun" },
+    "year": { "value": 2023 },
+    "pj_max": { "value": 4 },
+    "duration": { "value": 2 },
+    "deaths": { "value": 5 }
+  },
+  {
+    "campaign": { "value": "Les Jardins de Cendre" },
+    "gm": { "value": "Antoine" },
+    "game": { "value": "Blades in the Dark" },
+    "year": { "value": 2025 },
+    "pj_max": { "value": 3 },
+    "duration": { "value": 1 },
+    "deaths": { "value": 2 }
+  },
+  {
+    "campaign": {
+      "value": "L'Aube des Six Royaumes",
+      "notes": [
+        "Neuf ans de jeu, trois déménagements et deux changements de table.",
+        "La seule campagne de la guilde à être allée jusqu'au niveau 20."
+      ]
+    },
+    "gm": { "value": "Camille" },
+    "game": { "value": "Dungeons & Dragons 5e" },
+    "year": { "value": 2015 },
+    "pj_max": { "value": 8 },
+    "duration": { "value": 9 },
+    "deaths": { "value": 21 }
+  },
+  {
+    "campaign": { "value": "Le Chant des Profondeurs" },
+    "gm": { "value": "Sophie" },
+    "game": { "value": "L'Appel de Cthulhu" },
+    "year": { "value": 2021 },
+    "pj_max": { "value": 4 },
+    "duration": { "value": 3 },
+    "deaths": { "value": 8 }
+  }
+]

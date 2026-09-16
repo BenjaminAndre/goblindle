@@ -1,109 +1,91 @@
-// Classic mode: compare two champions across 7 attributes
+// Classic mode: compare two campaigns across 6 attributes
 
-/** Attributes displayed in order */
+/**
+ * Attributes displayed in order. The grid reads its column count from this
+ * list, so adding an entry here is the whole change — see guess-grid.svelte.
+ */
 export const CLASSIC_ATTRIBUTES = [
-  { key: "gender", label: "Gender", type: "exact" },
-  { key: "genre", label: "Genre", type: "multi" },
-  { key: "attackType", label: "Range", type: "exact" },
-  { key: "resource", label: "Resource", type: "exact" },
-  { key: "region", label: "Region", type: "exact" },
-  { key: "lane", label: "Lane", type: "multi" },
-  { key: "releaseDate", label: "Year", type: "year" },
+  { key: "gm", label: "MJ", type: "exact" },
+  { key: "game", label: "Jeu", type: "exact" },
+  { key: "year", label: "Année", type: "numeric" },
+  { key: "pj_max", label: "PJ max", type: "numeric" },
+  { key: "duration", label: "Durée", type: "numeric", format: "years" },
+  { key: "deaths", label: "Morts", type: "numeric" },
 ];
 
-/** Compare guess champion against target champion */
-export function compareChampions(guess, target) {
+/** Compare guess campaign against target campaign */
+export function compareCampaigns(guess, target) {
   return CLASSIC_ATTRIBUTES.map((attr) => {
-    const guessVal = guess[attr.key] || "";
-    const targetVal = target[attr.key] || "";
+    // `?? null`, never `|| ""` — 0 is a real answer (a campaign with no deaths),
+    // and collapsing it to "" would render "—" and suppress the arrow.
+    const guessVal = guess[attr.key] ?? null;
+    const targetVal = target[attr.key] ?? null;
+
+    const formatted = {
+      guessValue: formatValue(attr, guessVal),
+      targetValue: formatValue(attr, targetVal),
+    };
 
     switch (attr.type) {
       case "exact":
         return {
           ...attr,
-          guessValue: formatValue(attr.key, guessVal),
-          targetValue: formatValue(attr.key, targetVal),
-          result: guessVal.toLowerCase() === targetVal.toLowerCase() ? "correct" : "wrong",
+          ...formatted,
+          // String(... ?? "") and not guessVal.toLowerCase(): a campaign may
+          // legitimately omit a field, and a throw here would be swallowed
+          // mid-guess and freeze the board.
+          result:
+            String(guessVal ?? "").toLowerCase() ===
+            String(targetVal ?? "").toLowerCase()
+              ? "correct"
+              : "wrong",
         };
 
-      case "multi":
-        return {
-          ...attr,
-          guessValue: formatValue(attr.key, guessVal),
-          targetValue: formatValue(attr.key, targetVal),
-          result: compareMultiValue(guessVal, targetVal),
-        };
-
-      case "year":
-        return {
-          ...attr,
-          guessValue: guessVal || "?",
-          targetValue: targetVal || "?",
-          ...compareYear(guessVal, targetVal),
-        };
+      case "numeric":
+        return { ...attr, ...formatted, ...compareNumeric(guessVal, targetVal) };
 
       default:
-        return { ...attr, guessValue: guessVal, targetValue: targetVal, result: "wrong" };
+        return { ...attr, ...formatted, result: "wrong" };
     }
   });
 }
 
-function compareMultiValue(guessStr, targetStr) {
-  const guessSet = parseSet(guessStr);
-  const targetSet = parseSet(targetStr);
+/**
+ * Numeric comparison with a direction hint pointing toward the target.
+ *
+ * Coercion goes through toNumber rather than Number() directly, because
+ * Number(null) is 0 — a missing value would otherwise compare as a legitimate
+ * zero and draw an arrow that lies about a value nobody recorded.
+ */
+function compareNumeric(guessVal, targetVal) {
+  const g = toNumber(guessVal);
+  const t = toNumber(targetVal);
 
-  if (guessSet.size === 0 && targetSet.size === 0) return "correct";
-  if (guessSet.size === 0 || targetSet.size === 0) return "wrong";
-  if (setsEqual(guessSet, targetSet)) return "correct";
-
-  for (const val of guessSet) {
-    if (targetSet.has(val)) return "partial";
-  }
-  return "wrong";
-}
-
-function compareYear(guessYear, targetYear) {
-  const g = Number(guessYear);
-  const t = Number(targetYear);
-
-  if (!g || !t) return { result: "wrong" };
+  if (!Number.isFinite(g) || !Number.isFinite(t)) return { result: "wrong" };
   if (g === t) return { result: "correct" };
   return { result: "wrong", direction: g < t ? "up" : "down" };
 }
 
-function parseSet(str) {
-  if (!str) return new Set();
-  return new Set(
-    str.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean),
-  );
+function toNumber(value) {
+  if (value === null || value === undefined || value === "") return NaN;
+  return Number(value);
 }
 
-function setsEqual(a, b) {
-  if (a.size !== b.size) return false;
-  for (const val of a) {
-    if (!b.has(val)) return false;
-  }
-  return true;
+/**
+ * Values are authored in French, ready to display, so this switches on type
+ * rather than on a second hardcoded list of keys.
+ */
+function formatValue(attr, value) {
+  if (value === null || value === undefined || value === "") return "—";
+  if (attr.format === "years") return formatYears(value);
+  // String(), never toLocaleString() — French digit grouping would render the
+  // year 2024 as "2 024".
+  return String(value);
 }
 
-function formatValue(key, value) {
-  if (!value) return "—";
-
-  switch (key) {
-    case "gender":
-      return capitalize(value);
-    case "attackType":
-      return value === "close" ? "Melee" : "Ranged";
-    case "region":
-      return value.split("-").map(capitalize).join(" ");
-    case "genre":
-    case "lane":
-      return value.split(",").map((s) => capitalize(s.trim())).join(", ");
-    default:
-      return value;
-  }
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+function formatYears(value) {
+  const years = toNumber(value);
+  if (!Number.isFinite(years)) return "—";
+  if (years === 0) return "< 1 an";
+  return years > 1 ? `${years} ans` : `${years} an`;
 }

@@ -39,15 +39,3 @@ jobs:
       # No BASE_PATH here: this checks that the app compiles. The base-path
       # behaviour is verified against a real preview before release.
       - run: npm run build
-
-  scraper:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-go@v6
-        with:
-          go-version-file: data/go.mod
-
-      - run: go build ./... && go test ./...
-        working-directory: data

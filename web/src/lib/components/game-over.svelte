@@ -1,5 +1,5 @@
 <script>
-  import { getChampionImageUrl } from "$lib/champion-data";
+  import CampaignAvatar from "./campaign-avatar.svelte";
 
   /** Win/loss message with optional new game button */
   let { isWon, target, guessCount, onNewGame } = $props();
@@ -11,28 +11,25 @@
       ? 'text-[var(--color-correct)]'
       : 'text-[var(--color-wrong)]'}"
   >
-    {isWon ? "You got it!" : "Game Over"}
+    {isWon ? "Bravo !" : "Perdu"}
   </h2>
 
   {#if isWon}
+    <!-- French pluralises from 2, so "0 essai" and "1 essai" both stay singular. -->
     <p class="text-[var(--color-text-muted)] mb-3">
-      You found <strong class="text-[var(--color-text)]">{target.name}</strong> in
-      <strong class="text-[var(--color-text)]">{guessCount}</strong>
-      guess{guessCount > 1 ? "es" : ""}!
+      Vous avez trouvé <strong class="text-[var(--color-text)]">{target.name}</strong>
+      en <strong class="text-[var(--color-text)]">{guessCount}</strong>
+      essai{guessCount > 1 ? "s" : ""} !
     </p>
   {:else}
     <p class="text-[var(--color-text-muted)] mb-3">
-      The champion was <strong class="text-[var(--color-text)]"
+      La campagne était <strong class="text-[var(--color-text)]"
         >{target.name}</strong
       >
     </p>
-    <img
-      src={getChampionImageUrl(target.id)}
-      alt={target.name}
-      width="80"
-      height="80"
-      class="rounded-lg object-cover mx-auto"
-    />
+    <div class="flex justify-center">
+      <CampaignAvatar campaign={target} size={80} />
+    </div>
   {/if}
 
   {#if onNewGame}
@@ -40,7 +37,7 @@
       onclick={onNewGame}
       class="mt-4 px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-text)] font-semibold cursor-pointer transition-opacity hover:opacity-85"
     >
-      New Game
+      Nouvelle partie
     </button>
   {/if}
 </div>

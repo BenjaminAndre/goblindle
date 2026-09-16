@@ -5,8 +5,8 @@
 </script>
 
 <svelte:head>
-  <title>LoLdle</title>
-  <meta name="description" content="Guess the League of Legends champion" />
+  <title>Goblindle</title>
+  <meta name="description" content="Devinez la campagne du jour de la guilde" />
 </svelte:head>
 
 {@render children()}

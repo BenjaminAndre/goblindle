@@ -1,21 +1,15 @@
 <script>
-  import { getChampionImageUrl } from "$lib/champion-data";
+  import CampaignAvatar from "./campaign-avatar.svelte";
 
   /** Single guess row with colored attribute cells */
-  let { champion, results } = $props();
+  let { campaign, results } = $props();
 </script>
 
 <div class="guess-row">
-  <!-- Champion name + image -->
-  <div class="guess-cell champion-cell" style="animation-delay: 0s">
-    <img
-      src={getChampionImageUrl(champion.id)}
-      alt={champion.name}
-      width="40"
-      height="40"
-      class="rounded object-cover shrink-0"
-    />
-    <span class="text-xs font-semibold">{champion.name}</span>
+  <!-- Campaign name + illustration -->
+  <div class="guess-cell campaign-cell" style="animation-delay: 0s">
+    <CampaignAvatar {campaign} size={40} />
+    <span class="text-xs font-semibold">{campaign.name}</span>
   </div>
 
   <!-- Attribute cells: the within-row reveal stagger -->

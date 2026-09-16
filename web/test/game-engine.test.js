@@ -8,21 +8,21 @@ import {
   saveUnlimitedStats,
   submitGuess,
 } from "$lib/game-engine";
-import { AATROX, AHRI } from "./fixtures/champions";
+import { GOBELINS, OMBRES } from "./fixtures/campaigns";
 
-/** Minimal stand-in for compareChampions — the engine only stores what this returns. */
+/** Minimal stand-in for compareCampaigns — the engine only stores what this returns. */
 const compareFn = (guess, target) => [
   { key: "name", result: guess.name === target.name ? "correct" : "wrong" },
 ];
 
-/** Synthesize a distinct non-target champion. */
+/** Synthesize a distinct non-target campaign. */
 function other(name) {
-  return { ...AHRI, id: name, name };
+  return { ...OMBRES, id: name, name };
 }
 
 function daily(overrides = {}) {
   return createGame({
-    target: AATROX,
+    target: GOBELINS,
     compareFn,
     maxGuesses: 6,
     mode: "daily",
@@ -33,7 +33,7 @@ function daily(overrides = {}) {
 
 function unlimited(overrides = {}) {
   return createGame({
-    target: AATROX,
+    target: GOBELINS,
     compareFn,
     maxGuesses: 0,
     mode: "unlimited",
@@ -53,7 +53,7 @@ describe("createGame", () => {
 
   it("carries config through onto the game object", () => {
     expect(daily()).toMatchObject({
-      target: AATROX,
+      target: GOBELINS,
       maxGuesses: 6,
       mode: "daily",
       seed: "2026-07-25",
@@ -61,7 +61,7 @@ describe("createGame", () => {
   });
 
   it("defaults to 6 guesses in daily mode when maxGuesses is omitted", () => {
-    const game = createGame({ target: AATROX, compareFn });
+    const game = createGame({ target: GOBELINS, compareFn });
     expect(game.maxGuesses).toBe(6);
     expect(game.mode).toBe("daily");
   });
@@ -69,39 +69,39 @@ describe("createGame", () => {
 
 describe("submitGuess", () => {
   it("appends the guess and its comparison result", () => {
-    const game = submitGuess(daily(), AHRI);
-    expect(game.guesses).toEqual([AHRI]);
+    const game = submitGuess(daily(), OMBRES);
+    expect(game.guesses).toEqual([OMBRES]);
     expect(game.results).toHaveLength(1);
   });
 
   it("does not mutate the game it was given", () => {
     const before = daily();
-    submitGuess(before, AHRI);
+    submitGuess(before, OMBRES);
     expect(before.guesses).toHaveLength(0);
     expect(before.results).toHaveLength(0);
   });
 
   it("returns fresh array identities so reassignment is observable", () => {
     const before = daily();
-    const after = submitGuess(before, AHRI);
+    const after = submitGuess(before, OMBRES);
     expect(after).not.toBe(before);
     expect(after.guesses).not.toBe(before.guesses);
     expect(after.results).not.toBe(before.results);
   });
 
   it("rejects a duplicate guess with null", () => {
-    const game = submitGuess(daily(), AHRI);
-    expect(submitGuess(game, AHRI)).toBeNull();
+    const game = submitGuess(daily(), OMBRES);
+    expect(submitGuess(game, OMBRES)).toBeNull();
   });
 
   it("rejects any guess once the game is over", () => {
-    const game = submitGuess(daily(), AATROX);
+    const game = submitGuess(daily(), GOBELINS);
     expect(game.isOver).toBe(true);
-    expect(submitGuess(game, AHRI)).toBeNull();
+    expect(submitGuess(game, OMBRES)).toBeNull();
   });
 
-  it("wins on the correct champion", () => {
-    expect(submitGuess(daily(), AATROX)).toMatchObject({
+  it("wins on the correct campaign", () => {
+    expect(submitGuess(daily(), GOBELINS)).toMatchObject({
       isWon: true,
       isOver: true,
     });
@@ -114,7 +114,7 @@ describe("submitGuess", () => {
     }
     expect(game.isOver).toBe(false);
 
-    game = submitGuess(game, AATROX);
+    game = submitGuess(game, GOBELINS);
     expect(game).toMatchObject({ isWon: true, isOver: true });
     expect(game.guesses).toHaveLength(6);
   });
@@ -139,28 +139,28 @@ describe("submitGuess", () => {
 });
 
 describe("persistence — storage key contract", () => {
-  it("writes daily state to exactly loldle_daily_<seed>", () => {
-    submitGuess(daily(), AHRI);
-    expect(localStorage.getItem("loldle_daily_2026-07-25")).not.toBeNull();
+  it("writes daily state to exactly goblindle_v1_daily_<seed>", () => {
+    submitGuess(daily(), OMBRES);
+    expect(localStorage.getItem("goblindle_v1_daily_2026-07-25")).not.toBeNull();
   });
 
-  it("writes unlimited state to exactly loldle_unlimited_current", () => {
-    submitGuess(unlimited(), AHRI);
-    expect(localStorage.getItem("loldle_unlimited_current")).not.toBeNull();
+  it("writes unlimited state to exactly goblindle_v1_unlimited_current", () => {
+    submitGuess(unlimited(), OMBRES);
+    expect(localStorage.getItem("goblindle_v1_unlimited_current")).not.toBeNull();
   });
 
   it("ignores the seed when keying unlimited state", () => {
-    submitGuess(unlimited({ seed: "unlimited_999" }), AHRI);
-    expect(localStorage.getItem("loldle_unlimited_current")).not.toBeNull();
-    expect(localStorage.getItem("loldle_unlimited_unlimited_999")).toBeNull();
+    submitGuess(unlimited({ seed: "unlimited_999" }), OMBRES);
+    expect(localStorage.getItem("goblindle_v1_unlimited_current")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_unlimited_999")).toBeNull();
   });
 
   it("stores the target name, guesses, results and flags", () => {
-    submitGuess(daily(), AHRI);
-    const saved = JSON.parse(localStorage.getItem("loldle_daily_2026-07-25"));
+    submitGuess(daily(), OMBRES);
+    const saved = JSON.parse(localStorage.getItem("goblindle_v1_daily_2026-07-25"));
     expect(saved).toMatchObject({
-      targetName: "Aatrox",
-      guesses: [AHRI],
+      targetName: "La Campagne des Gobelins",
+      guesses: [OMBRES],
       isOver: false,
       isWon: false,
     });
@@ -170,21 +170,21 @@ describe("persistence — storage key contract", () => {
 
 describe("persistence — restore on createGame", () => {
   it("restores an in-progress game for the same target", () => {
-    submitGuess(daily(), AHRI);
+    submitGuess(daily(), OMBRES);
     const restored = daily();
-    expect(restored.guesses).toEqual([AHRI]);
+    expect(restored.guesses).toEqual([OMBRES]);
     expect(restored.results).toHaveLength(1);
   });
 
   it("restores the over and won flags", () => {
-    submitGuess(daily(), AATROX);
+    submitGuess(daily(), GOBELINS);
     expect(daily()).toMatchObject({ isOver: true, isWon: true });
   });
 
   it("discards saved state when the target changed — the date-rollover case", () => {
-    submitGuess(daily(), AHRI);
+    submitGuess(daily(), OMBRES);
     const fresh = createGame({
-      target: { ...AHRI, name: "Ahri" },
+      target: { ...OMBRES, name: "Une Autre Campagne" },
       compareFn,
       maxGuesses: 6,
       mode: "daily",
@@ -195,38 +195,55 @@ describe("persistence — restore on createGame", () => {
   });
 
   it("starts fresh when storage holds malformed JSON", () => {
-    localStorage.setItem("loldle_daily_2026-07-25", "{not json");
+    localStorage.setItem("goblindle_v1_daily_2026-07-25", "{not json");
     expect(daily().guesses).toEqual([]);
+  });
+
+  /**
+   * Results are recomputed rather than read back, so a restored game reflects
+   * the current attribute list and the current campaign values — an edit to
+   * campaigns.json cannot leave a player looking at arrows that contradict the
+   * answer they are eventually shown.
+   */
+  it("recomputes results on restore instead of trusting the saved array", () => {
+    submitGuess(daily(), OMBRES);
+
+    const key = "goblindle_v1_daily_2026-07-25";
+    const saved = JSON.parse(localStorage.getItem(key));
+    saved.results = [[{ key: "stale", result: "correct" }]];
+    localStorage.setItem(key, JSON.stringify(saved));
+
+    expect(daily().results).toEqual([compareFn(OMBRES, GOBELINS)]);
   });
 });
 
 describe("clearExpiredCache", () => {
   it("removes yesterday's daily entry but keeps today's", () => {
-    localStorage.setItem("loldle_daily_2026-07-24", "{}");
-    localStorage.setItem("loldle_daily_2026-07-25", "{}");
+    localStorage.setItem("goblindle_v1_daily_2026-07-24", "{}");
+    localStorage.setItem("goblindle_v1_daily_2026-07-25", "{}");
 
     clearExpiredCache("2026-07-25");
 
-    expect(localStorage.getItem("loldle_daily_2026-07-24")).toBeNull();
-    expect(localStorage.getItem("loldle_daily_2026-07-25")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v1_daily_2026-07-24")).toBeNull();
+    expect(localStorage.getItem("goblindle_v1_daily_2026-07-25")).not.toBeNull();
   });
 
   it("leaves unlimited keys untouched", () => {
-    localStorage.setItem("loldle_unlimited_current", "{}");
-    localStorage.setItem("loldle_unlimited_stats", "{}");
-    localStorage.setItem("loldle_unlimited_seed", "s");
+    localStorage.setItem("goblindle_v1_unlimited_current", "{}");
+    localStorage.setItem("goblindle_v1_unlimited_stats", "{}");
+    localStorage.setItem("goblindle_v1_unlimited_seed", "s");
 
     clearExpiredCache("2026-07-25");
 
-    expect(localStorage.getItem("loldle_unlimited_current")).not.toBeNull();
-    expect(localStorage.getItem("loldle_unlimited_stats")).not.toBeNull();
-    expect(localStorage.getItem("loldle_unlimited_seed")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_current")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_seed")).not.toBeNull();
   });
 
   it("removes every stale daily entry, not just the first", () => {
-    localStorage.setItem("loldle_daily_2026-07-20", "{}");
-    localStorage.setItem("loldle_daily_2026-07-21", "{}");
-    localStorage.setItem("loldle_daily_2026-07-22", "{}");
+    localStorage.setItem("goblindle_v1_daily_2026-07-20", "{}");
+    localStorage.setItem("goblindle_v1_daily_2026-07-21", "{}");
+    localStorage.setItem("goblindle_v1_daily_2026-07-22", "{}");
 
     clearExpiredCache("2026-07-25");
 
@@ -238,13 +255,29 @@ describe("clearExpiredCache", () => {
     clearExpiredCache("2026-07-25");
     expect(localStorage.getItem("unrelated")).toBe("keep");
   });
+
+  /**
+   * The sweep only ever covered its own prefix, so state written before the
+   * rename would have sat in localStorage forever. It has to go: a saved
+   * results array from the champion schema has a different column count and
+   * would overflow the guess grid if it were ever restored.
+   */
+  it("sweeps keys left by earlier versions", () => {
+    localStorage.setItem("loldle_daily_2026-07-25", "{}");
+    localStorage.setItem("loldle_unlimited_current", "{}");
+    localStorage.setItem("loldle_unlimited_stats", "{}");
+
+    clearExpiredCache("2026-07-25");
+
+    expect(localStorage.length).toBe(0);
+  });
 });
 
 describe("unlimited seed", () => {
   it("creates and persists a seed on first call", () => {
     const seed = getOrCreateUnlimitedSeed();
     expect(seed).toMatch(/^unlimited_/);
-    expect(localStorage.getItem("loldle_unlimited_seed")).toBe(seed);
+    expect(localStorage.getItem("goblindle_v1_unlimited_seed")).toBe(seed);
   });
 
   it("returns the same seed on subsequent calls", () => {
@@ -252,17 +285,17 @@ describe("unlimited seed", () => {
   });
 
   it("clearUnlimitedState drops both the seed and the current game", () => {
-    submitGuess(unlimited(), AHRI);
+    submitGuess(unlimited(), OMBRES);
     getOrCreateUnlimitedSeed();
 
     clearUnlimitedState();
 
-    expect(localStorage.getItem("loldle_unlimited_current")).toBeNull();
-    expect(localStorage.getItem("loldle_unlimited_seed")).toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_current")).toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_seed")).toBeNull();
   });
 
   it("clearUnlimitedState preserves accumulated stats", () => {
-    localStorage.setItem("loldle_unlimited_stats", '{"gamesPlayed":3}');
+    localStorage.setItem("goblindle_v1_unlimited_stats", '{"gamesPlayed":3}');
     clearUnlimitedState();
     expect(loadUnlimitedStats().gamesPlayed).toBe(3);
   });
@@ -280,7 +313,7 @@ describe("saveUnlimitedStats", () => {
     for (let i = 0; i < wrongGuesses; i++) {
       game = submitGuess(game, other(`c${i}`));
     }
-    if (won) game = submitGuess(game, AATROX);
+    if (won) game = submitGuess(game, GOBELINS);
     else game = { ...game, isOver: true };
     return game;
   }
@@ -326,14 +359,14 @@ describe("saveUnlimitedStats", () => {
   });
 
   it("is a no-op for daily mode", () => {
-    const game = submitGuess(daily(), AATROX);
+    const game = submitGuess(daily(), GOBELINS);
     saveUnlimitedStats(game);
-    expect(localStorage.getItem("loldle_unlimited_stats")).toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).toBeNull();
   });
 
   it("is a no-op for an unfinished game", () => {
-    saveUnlimitedStats(submitGuess(unlimited(), AHRI));
-    expect(localStorage.getItem("loldle_unlimited_stats")).toBeNull();
+    saveUnlimitedStats(submitGuess(unlimited(), OMBRES));
+    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).toBeNull();
   });
 });
 
@@ -348,7 +381,7 @@ describe("loadUnlimitedStats", () => {
   });
 
   it("returns zeroed stats when storage holds malformed JSON", () => {
-    localStorage.setItem("loldle_unlimited_stats", "not json at all");
+    localStorage.setItem("goblindle_v1_unlimited_stats", "not json at all");
     expect(loadUnlimitedStats()).toMatchObject({
       gamesPlayed: 0,
       gamesWon: 0,

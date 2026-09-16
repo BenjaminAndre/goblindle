@@ -1,11 +1,11 @@
 <script>
   import { onMount } from "svelte";
   import {
-    getRandomChampion,
+    getRandomCampaign,
     getTodaySeed,
-    loadChampions,
-  } from "$lib/champion-data";
-  import { compareChampions } from "$lib/classic-mode";
+    loadCampaigns,
+  } from "$lib/campaign-data";
+  import { compareCampaigns } from "$lib/classic-mode";
   import {
     clearExpiredCache,
     clearUnlimitedState,
@@ -15,7 +15,7 @@
     saveUnlimitedStats,
     submitGuess,
   } from "$lib/game-engine";
-  import ChampionSearch from "./champion-search.svelte";
+  import CampaignSearch from "./campaign-search.svelte";
   import GameOver from "./game-over.svelte";
   import GuessGrid from "./guess-grid.svelte";
   import StatsDisplay from "./stats-display.svelte";
@@ -31,12 +31,12 @@
   function initGame(gameMode) {
     const seed =
       gameMode === "daily" ? getTodaySeed() : getOrCreateUnlimitedSeed();
-    const target = getRandomChampion(seed);
+    const target = getRandomCampaign(seed);
     const maxGuesses = gameMode === "daily" ? 6 : 0;
 
     game = createGame({
       target,
-      compareFn: compareChampions,
+      compareFn: compareCampaigns,
       maxGuesses,
       mode: gameMode,
       seed,
@@ -45,10 +45,10 @@
   }
 
   // Browser-only and once-only by construction: the prerender pass has no
-  // localStorage and no champions.json to fetch.
+  // localStorage and no campaigns.json to fetch.
   onMount(async () => {
     try {
-      await loadChampions();
+      await loadCampaigns();
       clearExpiredCache(getTodaySeed());
       initGame("daily");
     } catch (err) {
@@ -63,10 +63,10 @@
     initGame(newMode);
   }
 
-  function handleGuess(champion) {
+  function handleGuess(campaign) {
     if (!game) return;
 
-    const updated = submitGuess(game, champion);
+    const updated = submitGuess(game, campaign);
     if (!updated) return;
 
     // Always reassign — submitGuess returns new objects, so mutation would
@@ -87,11 +87,11 @@
 
 {#if loading}
   <p class="text-center text-[var(--color-text-muted)] py-8">
-    Loading champions...
+    Chargement des campagnes...
   </p>
 {:else if error}
   <p class="text-center text-[var(--color-wrong)] py-8">
-    Failed to load champion data. Please refresh.
+    Impossible de charger les campagnes. Rechargez la page.
   </p>
 {:else if game}
   <!-- Mode toggle -->
@@ -105,7 +105,7 @@
         ? 'bg-[var(--color-accent)] text-[var(--color-text)]'
         : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]'}"
     >
-      Daily
+      Quotidien
     </button>
     <button
       onclick={() => switchMode("unlimited")}
@@ -114,7 +114,7 @@
         ? 'bg-[var(--color-accent)] text-[var(--color-text)]'
         : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]'}"
     >
-      Unlimited
+      Illimité
     </button>
   </div>
 
@@ -122,7 +122,7 @@
     <StatsDisplay {stats} />
   {/if}
 
-  <ChampionSearch
+  <CampaignSearch
     {excludeNames}
     onSelect={handleGuess}
     disabled={game.isOver}
@@ -130,8 +130,8 @@
 
   <p class="text-center text-[var(--color-text-muted)] text-sm my-3">
     {game.maxGuesses > 0
-      ? `${game.guesses.length} / ${game.maxGuesses} guesses`
-      : `${game.guesses.length} guess${game.guesses.length !== 1 ? "es" : ""}`}
+      ? `${game.guesses.length} / ${game.maxGuesses} essais`
+      : `${game.guesses.length} essai${game.guesses.length > 1 ? "s" : ""}`}
   </p>
 
   <GuessGrid guesses={game.guesses} results={game.results} />

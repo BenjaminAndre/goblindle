@@ -1,10 +1,10 @@
-# loldle
+# goblindle
 
-LoLdle-style League of Legends daily champion guessing game — data auto-updated by the scraper in [`data/`](../data/).
+A daily guessing game for the guild's tabletop RPG campaigns. The UI is in
+French.
 
-Live: https://tiennm99.github.io/loldle/
-
-Built with SvelteKit and Svelte 5, styled with Tailwind CSS, and prerendered to a static site deployed on GitHub Pages.
+Built with SvelteKit and Svelte 5, styled with Tailwind CSS, and prerendered to
+a static site deployed on GitHub Pages.
 
 ## Quick start
 
@@ -23,7 +23,11 @@ npm test         # unit tests
 npm run lint     # eslint
 ```
 
-Champion data lives in `static/champions.json` and is refreshed weekly by the sync workflow.
+## Data
+
+Campaign data is hand-edited in `static/campaigns.json`; optional illustrations
+go in `static/img/campaigns/`. See the [root README](../README.md) for the entry
+format and the rules the loader enforces.
 
 ## License
 

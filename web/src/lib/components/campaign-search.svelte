@@ -1,7 +1,8 @@
 <script>
-  import { getChampionImageUrl, searchChampions } from "$lib/champion-data";
+  import { searchCampaigns } from "$lib/campaign-data";
+  import CampaignAvatar from "./campaign-avatar.svelte";
 
-  /** Autocomplete search input for champion selection */
+  /** Autocomplete search input for campaign selection */
   let { excludeNames, onSelect, disabled } = $props();
 
   let query = $state("");
@@ -13,7 +14,7 @@
   let dropdownEl = $state();
 
   let matches = $derived.by(() =>
-    query.trim() ? searchChampions(query, excludeNames) : [],
+    query.trim() ? searchCampaigns(query, excludeNames) : [],
   );
 
   // Derived, never assigned from an effect — writing state that the same effect
@@ -37,11 +38,11 @@
     return () => document.removeEventListener("mousedown", handleClick);
   });
 
-  function selectChampion(champion) {
+  function selectCampaign(campaign) {
     query = "";
     isOpen = false;
     activeIndex = -1;
-    onSelect(champion);
+    onSelect(campaign);
   }
 
   function handleKeyDown(e) {
@@ -56,7 +57,7 @@
     } else if (e.key === "Enter") {
       e.preventDefault();
       if (activeIndex >= 0 && activeIndex < matches.length) {
-        selectChampion(matches[activeIndex]);
+        selectCampaign(matches[activeIndex]);
       }
     } else if (e.key === "Escape") {
       e.preventDefault();
@@ -72,10 +73,10 @@
     type="text"
     role="combobox"
     aria-expanded={isVisible}
-    aria-controls="champion-listbox"
+    aria-controls="campaign-listbox"
     aria-autocomplete="list"
     aria-activedescendant={activeIndex >= 0
-      ? `champion-option-${activeIndex}`
+      ? `campaign-option-${activeIndex}`
       : undefined}
     bind:value={query}
     oninput={() => {
@@ -84,7 +85,9 @@
     }}
     onkeydown={handleKeyDown}
     {disabled}
-    placeholder={disabled ? "Game over" : "Type a champion name..."}
+    placeholder={disabled
+      ? "Partie terminée"
+      : "Tapez le nom d'une campagne..."}
     autocomplete="off"
     class="w-full px-4 py-3 rounded-lg bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] text-[var(--color-text)] text-base outline-none transition-colors focus:border-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-[var(--color-text-muted)]"
   />
@@ -92,28 +95,22 @@
   {#if isVisible}
     <ul
       bind:this={dropdownEl}
-      id="champion-listbox"
+      id="campaign-listbox"
       role="listbox"
       class="absolute top-full left-4 right-4 list-none m-0 p-0 bg-[var(--color-surface)] border border-[var(--color-input-border)] rounded-b-lg max-h-80 overflow-y-auto z-50"
     >
-      {#each matches as champion, i (champion.id)}
-        <li id="champion-option-{i}" role="option" aria-selected={i === activeIndex}>
+      {#each matches as campaign, i (campaign.id)}
+        <li id="campaign-option-{i}" role="option" aria-selected={i === activeIndex}>
           <button
             type="button"
-            onclick={() => selectChampion(champion)}
+            onclick={() => selectCampaign(campaign)}
             class="w-full text-left flex items-center gap-2.5 px-3 py-2 cursor-pointer transition-colors {i ===
             activeIndex
               ? 'bg-[var(--color-surface-hover)]'
               : 'hover:bg-[var(--color-surface-hover)]'}"
           >
-            <img
-              src={getChampionImageUrl(champion.id)}
-              alt={champion.name}
-              width="36"
-              height="36"
-              class="rounded object-cover"
-            />
-            <span class="text-sm">{champion.name}</span>
+            <CampaignAvatar {campaign} size={36} />
+            <span class="text-sm">{campaign.name}</span>
           </button>
         </li>
       {/each}

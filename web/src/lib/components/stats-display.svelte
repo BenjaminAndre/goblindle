@@ -9,9 +9,9 @@
   );
 
   let items = $derived([
-    { value: stats?.gamesPlayed, label: "Played" },
-    { value: `${winRate}%`, label: "Win Rate" },
-    { value: stats?.gamesWon, label: "Won" },
+    { value: stats?.gamesPlayed, label: "Parties" },
+    { value: `${winRate}%`, label: "Réussite" },
+    { value: stats?.gamesWon, label: "Victoires" },
   ]);
 </script>
 

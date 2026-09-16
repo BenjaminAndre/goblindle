@@ -1,12 +1,14 @@
 // Mode-agnostic game state machine with localStorage persistence
 
-const STORAGE_KEY_PREFIX = "loldle_";
+const STORAGE_KEY_PREFIX = "goblindle_v1_";
+/** Prefixes from earlier versions, swept on load so their state can never be restored. */
+const STALE_KEY_PREFIXES = ["loldle_"];
 const UNLIMITED_SEED_KEY = `${STORAGE_KEY_PREFIX}unlimited_seed`;
 
 /**
  * Create a new game instance
  * @param {Object} config
- * @param {Object} config.target - Target champion to guess
+ * @param {Object} config.target - Target campaign to guess
  * @param {Function} config.compareFn - (guess, target) => comparison results
  * @param {number} config.maxGuesses - Max allowed guesses (0 = unlimited)
  * @param {string} config.mode - "daily" or "unlimited"
@@ -25,7 +27,10 @@ export function createGame(config) {
       mode,
       seed,
       guesses: saved.guesses,
-      results: saved.results,
+      // Recomputed rather than restored: a saved results array was built against
+      // whatever CLASSIC_ATTRIBUTES looked like when it was written, and against
+      // the campaign values as they read at that moment.
+      results: saved.guesses.map((g) => compareFn(g, target)),
       isOver: saved.isOver,
       isWon: saved.isWon,
     };
@@ -45,18 +50,18 @@ export function createGame(config) {
 }
 
 /** Submit a guess and return updated game state (immutable) */
-export function submitGuess(game, champion) {
+export function submitGuess(game, campaign) {
   if (game.isOver) return null;
-  if (game.guesses.some((g) => g.name === champion.name)) return null;
+  if (game.guesses.some((g) => g.name === campaign.name)) return null;
 
-  const result = game.compareFn(champion, game.target);
-  const guesses = [...game.guesses, champion];
+  const result = game.compareFn(campaign, game.target);
+  const guesses = [...game.guesses, campaign];
   const results = [...game.results, result];
 
   let isWon = false;
   let isOver = false;
 
-  if (champion.name === game.target.name) {
+  if (campaign.name === game.target.name) {
     isWon = true;
     isOver = true;
   } else if (game.maxGuesses > 0 && guesses.length >= game.maxGuesses) {
@@ -175,9 +180,13 @@ export function clearExpiredCache(todaySeed) {
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith(`${STORAGE_KEY_PREFIX}daily_`) && key !== todayKey) {
-        keysToRemove.push(key);
-      }
+      if (!key) continue;
+      const isStaleDaily =
+        key.startsWith(`${STORAGE_KEY_PREFIX}daily_`) && key !== todayKey;
+      // Old prefixes go too — clearExpiredCache only ever swept its own, so
+      // pre-rename keys would otherwise sit in localStorage forever.
+      const isLegacy = STALE_KEY_PREFIXES.some((p) => key.startsWith(p));
+      if (isStaleDaily || isLegacy) keysToRemove.push(key);
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
   } catch {
