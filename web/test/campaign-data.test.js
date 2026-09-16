@@ -8,11 +8,8 @@ import {
 } from "./fixtures/campaigns";
 
 // $app/paths is a SvelteKit build-time construct with no meaning to a bare
-// Vitest run. The empty base matches a local build. `mocks` is hoisted so the
-// factory can read it, and the factory re-runs after vi.resetModules() — which
-// is how the base-path test below swaps the value for one import.
-const mocks = vi.hoisted(() => ({ base: "" }));
-vi.mock("$app/paths", () => ({ asset: (p) => p, base: mocks.base }));
+// Vitest run. The empty base matches a local build.
+vi.mock("$app/paths", () => ({ asset: (p) => p, base: "" }));
 
 /**
  * `campaigns` is module-private with no reset export, so each group gets a fresh
@@ -413,23 +410,8 @@ describe("getCampaignImageUrl", () => {
     expect(getCampaignImageUrl(undefined)).toBeNull();
   });
 
-  /**
-   * Unlike the Data Dragon URL this replaced, the path is site-relative, so it
-   * must pick up the base path the Pages deploy serves the site from.
-   */
-  it("goes through the base path", async () => {
-    mocks.base = "/goblindle";
-    vi.resetModules();
-    try {
-      const mod = await import("$lib/campaign-data");
-      expect(mod.getCampaignImageUrl({ image: "gobelins.webp" })).toBe(
-        "/goblindle/img/campaigns/gobelins.webp",
-      );
-    } finally {
-      mocks.base = "";
-      vi.resetModules();
-    }
-  });
+  // The base-path case needs a different $app/paths mock, and a mocked module
+  // is evaluated once per test file — so it lives in campaign-image-base.test.js.
 });
 
 describe("getCampaignInitials", () => {
