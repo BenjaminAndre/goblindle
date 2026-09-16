@@ -1,4 +1,5 @@
 <script>
+  import ContributeBanner from "$lib/components/contribute-banner.svelte";
   import GameBoard from "$lib/components/game-board.svelte";
 </script>
 
@@ -9,4 +10,5 @@
     </h1>
   </header>
   <GameBoard />
+  <ContributeBanner />
 </main>

@@ -144,5 +144,5 @@ export const SANS_MJ = {
   notes: {},
 };
 
-/** Load order matters for getRandomCampaign cycle assertions. */
+/** Load order matters for getCampaignForPeriod cycle assertions. */
 export const CAMPAIGNS = [GOBELINS, OMBRES, TRONE, EPEE, SANS_MJ];

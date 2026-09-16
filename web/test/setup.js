@@ -1,6 +1,17 @@
 import { beforeEach, vi } from "vitest";
 
 /**
+ * Pin the host time zone before anything imports a module.
+ *
+ * GitHub's runners are UTC, so a stray local getter used on a value that is
+ * only nominally UTC — the wall-clock arithmetic in schedule.js is full of
+ * them — would pass in CI and fail in Brussels. UTC+14 makes that class of bug
+ * fail loudly instead, and it is far enough out that an off-by-one day shows up
+ * immediately. Node re-reads TZ, so setting it here is enough.
+ */
+process.env.TZ = "Pacific/Kiritimati";
+
+/**
  * Minimal spec-shaped localStorage stub.
  * `key(i)` and `length` are required: clearExpiredCache iterates by index.
  */

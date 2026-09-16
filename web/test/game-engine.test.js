@@ -20,13 +20,13 @@ function other(name) {
   return { ...OMBRES, id: name, name };
 }
 
-function daily(overrides = {}) {
+function weekly(overrides = {}) {
   return createGame({
     target: GOBELINS,
     compareFn,
     maxGuesses: 6,
-    mode: "daily",
-    seed: "2026-07-25",
+    mode: "weekly",
+    seed: "2026-07-23",
     ...overrides,
   });
 }
@@ -44,7 +44,7 @@ function unlimited(overrides = {}) {
 
 describe("createGame", () => {
   it("starts empty and open", () => {
-    const game = daily();
+    const game = weekly();
     expect(game.guesses).toEqual([]);
     expect(game.results).toEqual([]);
     expect(game.isOver).toBe(false);
@@ -52,37 +52,37 @@ describe("createGame", () => {
   });
 
   it("carries config through onto the game object", () => {
-    expect(daily()).toMatchObject({
+    expect(weekly()).toMatchObject({
       target: GOBELINS,
       maxGuesses: 6,
-      mode: "daily",
-      seed: "2026-07-25",
+      mode: "weekly",
+      seed: "2026-07-23",
     });
   });
 
-  it("defaults to 6 guesses in daily mode when maxGuesses is omitted", () => {
+  it("defaults to 6 guesses in weekly mode when maxGuesses is omitted", () => {
     const game = createGame({ target: GOBELINS, compareFn });
     expect(game.maxGuesses).toBe(6);
-    expect(game.mode).toBe("daily");
+    expect(game.mode).toBe("weekly");
   });
 });
 
 describe("submitGuess", () => {
   it("appends the guess and its comparison result", () => {
-    const game = submitGuess(daily(), OMBRES);
+    const game = submitGuess(weekly(), OMBRES);
     expect(game.guesses).toEqual([OMBRES]);
     expect(game.results).toHaveLength(1);
   });
 
   it("does not mutate the game it was given", () => {
-    const before = daily();
+    const before = weekly();
     submitGuess(before, OMBRES);
     expect(before.guesses).toHaveLength(0);
     expect(before.results).toHaveLength(0);
   });
 
   it("returns fresh array identities so reassignment is observable", () => {
-    const before = daily();
+    const before = weekly();
     const after = submitGuess(before, OMBRES);
     expect(after).not.toBe(before);
     expect(after.guesses).not.toBe(before.guesses);
@@ -90,25 +90,25 @@ describe("submitGuess", () => {
   });
 
   it("rejects a duplicate guess with null", () => {
-    const game = submitGuess(daily(), OMBRES);
+    const game = submitGuess(weekly(), OMBRES);
     expect(submitGuess(game, OMBRES)).toBeNull();
   });
 
   it("rejects any guess once the game is over", () => {
-    const game = submitGuess(daily(), GOBELINS);
+    const game = submitGuess(weekly(), GOBELINS);
     expect(game.isOver).toBe(true);
     expect(submitGuess(game, OMBRES)).toBeNull();
   });
 
   it("wins on the correct campaign", () => {
-    expect(submitGuess(daily(), GOBELINS)).toMatchObject({
+    expect(submitGuess(weekly(), GOBELINS)).toMatchObject({
       isWon: true,
       isOver: true,
     });
   });
 
   it("still counts a win made with the final allowed guess", () => {
-    let game = daily();
+    let game = weekly();
     for (const name of ["a", "b", "c", "d", "e"]) {
       game = submitGuess(game, other(name));
     }
@@ -120,7 +120,7 @@ describe("submitGuess", () => {
   });
 
   it("ends the game as a loss at maxGuesses wrong guesses", () => {
-    let game = daily();
+    let game = weekly();
     for (const name of ["a", "b", "c", "d", "e", "f"]) {
       game = submitGuess(game, other(name));
     }
@@ -139,14 +139,26 @@ describe("submitGuess", () => {
 });
 
 describe("persistence — storage key contract", () => {
-  it("writes daily state to exactly goblindle_v1_daily_<seed>", () => {
-    submitGuess(daily(), OMBRES);
-    expect(localStorage.getItem("goblindle_v1_daily_2026-07-25")).not.toBeNull();
+  it("writes weekly state to exactly goblindle_v1_weekly_<seed>", () => {
+    submitGuess(weekly(), OMBRES);
+    expect(localStorage.getItem("goblindle_v1_weekly_2026-07-23")).not.toBeNull();
   });
 
   it("writes unlimited state to exactly goblindle_v1_unlimited_current", () => {
     submitGuess(unlimited(), OMBRES);
     expect(localStorage.getItem("goblindle_v1_unlimited_current")).not.toBeNull();
+  });
+
+  /**
+   * The seeded branch is the fallthrough on purpose. The other polarity would
+   * send an unrecognised mode to unlimited_current, where it silently shares
+   * state with the unlimited game and gets wiped by clearUnlimitedState — a bug
+   * that reads as "my progress sometimes vanishes" rather than as a crash.
+   */
+  it("gives an unknown mode its own key rather than the unlimited one", () => {
+    submitGuess(weekly({ mode: "bogus", seed: "x" }), OMBRES);
+    expect(localStorage.getItem("goblindle_v1_unlimited_current")).toBeNull();
+    expect(localStorage.getItem("goblindle_v1_weekly_x")).not.toBeNull();
   });
 
   it("ignores the seed when keying unlimited state", () => {
@@ -156,8 +168,8 @@ describe("persistence — storage key contract", () => {
   });
 
   it("stores the target name, guesses, results and flags", () => {
-    submitGuess(daily(), OMBRES);
-    const saved = JSON.parse(localStorage.getItem("goblindle_v1_daily_2026-07-25"));
+    submitGuess(weekly(), OMBRES);
+    const saved = JSON.parse(localStorage.getItem("goblindle_v1_weekly_2026-07-23"));
     expect(saved).toMatchObject({
       targetName: "La Campagne des Gobelins",
       guesses: [OMBRES],
@@ -170,33 +182,33 @@ describe("persistence — storage key contract", () => {
 
 describe("persistence — restore on createGame", () => {
   it("restores an in-progress game for the same target", () => {
-    submitGuess(daily(), OMBRES);
-    const restored = daily();
+    submitGuess(weekly(), OMBRES);
+    const restored = weekly();
     expect(restored.guesses).toEqual([OMBRES]);
     expect(restored.results).toHaveLength(1);
   });
 
   it("restores the over and won flags", () => {
-    submitGuess(daily(), GOBELINS);
-    expect(daily()).toMatchObject({ isOver: true, isWon: true });
+    submitGuess(weekly(), GOBELINS);
+    expect(weekly()).toMatchObject({ isOver: true, isWon: true });
   });
 
-  it("discards saved state when the target changed — the date-rollover case", () => {
-    submitGuess(daily(), OMBRES);
+  it("discards saved state when the target changed — the period-rollover case", () => {
+    submitGuess(weekly(), OMBRES);
     const fresh = createGame({
       target: { ...OMBRES, name: "Une Autre Campagne" },
       compareFn,
       maxGuesses: 6,
-      mode: "daily",
-      seed: "2026-07-25",
+      mode: "weekly",
+      seed: "2026-07-23",
     });
     expect(fresh.guesses).toEqual([]);
     expect(fresh.isOver).toBe(false);
   });
 
   it("starts fresh when storage holds malformed JSON", () => {
-    localStorage.setItem("goblindle_v1_daily_2026-07-25", "{not json");
-    expect(daily().guesses).toEqual([]);
+    localStorage.setItem("goblindle_v1_weekly_2026-07-23", "{not json");
+    expect(weekly().guesses).toEqual([]);
   });
 
   /**
@@ -206,26 +218,26 @@ describe("persistence — restore on createGame", () => {
    * answer they are eventually shown.
    */
   it("recomputes results on restore instead of trusting the saved array", () => {
-    submitGuess(daily(), OMBRES);
+    submitGuess(weekly(), OMBRES);
 
-    const key = "goblindle_v1_daily_2026-07-25";
+    const key = "goblindle_v1_weekly_2026-07-23";
     const saved = JSON.parse(localStorage.getItem(key));
     saved.results = [[{ key: "stale", result: "correct" }]];
     localStorage.setItem(key, JSON.stringify(saved));
 
-    expect(daily().results).toEqual([compareFn(OMBRES, GOBELINS)]);
+    expect(weekly().results).toEqual([compareFn(OMBRES, GOBELINS)]);
   });
 });
 
 describe("clearExpiredCache", () => {
-  it("removes yesterday's daily entry but keeps today's", () => {
-    localStorage.setItem("goblindle_v1_daily_2026-07-24", "{}");
-    localStorage.setItem("goblindle_v1_daily_2026-07-25", "{}");
+  it("removes a past period but keeps the current one", () => {
+    localStorage.setItem("goblindle_v1_weekly_2026-07-16", "{}");
+    localStorage.setItem("goblindle_v1_weekly_2026-07-23", "{}");
 
-    clearExpiredCache("2026-07-25");
+    clearExpiredCache("2026-07-23");
 
-    expect(localStorage.getItem("goblindle_v1_daily_2026-07-24")).toBeNull();
-    expect(localStorage.getItem("goblindle_v1_daily_2026-07-25")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v1_weekly_2026-07-16")).toBeNull();
+    expect(localStorage.getItem("goblindle_v1_weekly_2026-07-23")).not.toBeNull();
   });
 
   it("leaves unlimited keys untouched", () => {
@@ -233,26 +245,26 @@ describe("clearExpiredCache", () => {
     localStorage.setItem("goblindle_v1_unlimited_stats", "{}");
     localStorage.setItem("goblindle_v1_unlimited_seed", "s");
 
-    clearExpiredCache("2026-07-25");
+    clearExpiredCache("2026-07-23");
 
     expect(localStorage.getItem("goblindle_v1_unlimited_current")).not.toBeNull();
     expect(localStorage.getItem("goblindle_v1_unlimited_stats")).not.toBeNull();
     expect(localStorage.getItem("goblindle_v1_unlimited_seed")).not.toBeNull();
   });
 
-  it("removes every stale daily entry, not just the first", () => {
-    localStorage.setItem("goblindle_v1_daily_2026-07-20", "{}");
-    localStorage.setItem("goblindle_v1_daily_2026-07-21", "{}");
-    localStorage.setItem("goblindle_v1_daily_2026-07-22", "{}");
+  it("removes every past period, not just the first", () => {
+    localStorage.setItem("goblindle_v1_weekly_2026-07-02", "{}");
+    localStorage.setItem("goblindle_v1_weekly_2026-07-09", "{}");
+    localStorage.setItem("goblindle_v1_weekly_2026-07-16", "{}");
 
-    clearExpiredCache("2026-07-25");
+    clearExpiredCache("2026-07-23");
 
     expect(localStorage.length).toBe(0);
   });
 
   it("ignores unrelated keys", () => {
     localStorage.setItem("unrelated", "keep");
-    clearExpiredCache("2026-07-25");
+    clearExpiredCache("2026-07-23");
     expect(localStorage.getItem("unrelated")).toBe("keep");
   });
 
@@ -263,13 +275,31 @@ describe("clearExpiredCache", () => {
    * would overflow the guess grid if it were ever restored.
    */
   it("sweeps keys left by earlier versions", () => {
-    localStorage.setItem("loldle_daily_2026-07-25", "{}");
+    localStorage.setItem("loldle_daily_2026-07-23", "{}");
     localStorage.setItem("loldle_unlimited_current", "{}");
     localStorage.setItem("loldle_unlimited_stats", "{}");
 
-    clearExpiredCache("2026-07-25");
+    clearExpiredCache("2026-07-23");
 
     expect(localStorage.length).toBe(0);
+  });
+
+  /**
+   * The retired shape has to go while the unlimited keys stay: a saved results
+   * array from the daily schema was built against a different rotation, and the
+   * bluntest way to retire it — bumping the shared prefix — would take
+   * unlimited_stats and unlimited_seed down with it.
+   */
+  it("sweeps the retired daily shape without touching unlimited state", () => {
+    localStorage.setItem("goblindle_v1_daily_2026-07-23", "{}");
+    localStorage.setItem("goblindle_v1_unlimited_seed", "s");
+    localStorage.setItem("goblindle_v1_unlimited_stats", "{}");
+
+    clearExpiredCache("2026-07-23");
+
+    expect(localStorage.getItem("goblindle_v1_daily_2026-07-23")).toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_seed")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).not.toBeNull();
   });
 });
 
@@ -358,8 +388,8 @@ describe("saveUnlimitedStats", () => {
     expect(typeof loadUnlimitedStats().lastPlayed).toBe("number");
   });
 
-  it("is a no-op for daily mode", () => {
-    const game = submitGuess(daily(), GOBELINS);
+  it("is a no-op for weekly mode", () => {
+    const game = submitGuess(weekly(), GOBELINS);
     saveUnlimitedStats(game);
     expect(localStorage.getItem("goblindle_v1_unlimited_stats")).toBeNull();
   });

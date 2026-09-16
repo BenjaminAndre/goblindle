@@ -83,6 +83,60 @@ body {
   min-width: 0;
 }
 
+/*
+  Cells carrying an anecdote are <button>s. The whole cell is the tap target —
+  62x48px at the narrowest breakpoint, where a "?" glyph alone would be far
+  below the minimum.
+*/
+button.guess-cell {
+  position: relative;
+  cursor: pointer;
+  /* Inset, or the focus ring on the outermost columns is clipped by the
+     grid's horizontal scroll container. */
+  outline-offset: -2px;
+}
+
+.note-marker {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.55;
+  /* Absolute, not inline: at 62px wide the cell is already full with values
+     like "< 1 an". */
+  pointer-events: none;
+}
+
+/* The shared anecdote bubble — see note-popup.svelte for why it lives outside
+   the grid. */
+.note-bubble {
+  position: fixed;
+  z-index: 60;
+  max-width: min(280px, calc(100vw - 32px));
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--color-header);
+  color: var(--color-text);
+  border: 1px solid var(--color-input-border);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.45);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-align: left;
+  /* Laid out but invisible until it has been measured and placed, so it never
+     appears at (0, 0) first. */
+  visibility: hidden;
+  opacity: 0;
+  top: 0;
+  left: 0;
+}
+
+.note-bubble.is-visible {
+  visibility: visible;
+  opacity: 1;
+}
+
 /* Stand-in for campaigns with no illustration. */
 .campaign-avatar {
   display: flex;
@@ -119,6 +173,18 @@ body {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/*
+  .guess-cell starts at opacity 0 and only reaches 1 through cellReveal's
+  forwards fill, so switching the animation off here without restoring opacity
+  would blank the entire board.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .guess-cell {
+    animation: none;
+    opacity: 1;
   }
 }
 

@@ -1,11 +1,13 @@
 <script>
   import { onMount } from "svelte";
   import {
-    getRandomCampaign,
-    getTodaySeed,
+    getCampaignForPeriod,
+    getCampaignForSeed,
     loadCampaigns,
   } from "$lib/campaign-data";
   import { compareCampaigns } from "$lib/classic-mode";
+  import { pickNote } from "$lib/notes";
+  import { getCurrentPeriod } from "$lib/schedule";
   import {
     clearExpiredCache,
     clearUnlimitedState,
@@ -18,21 +20,68 @@
   import CampaignSearch from "./campaign-search.svelte";
   import GameOver from "./game-over.svelte";
   import GuessGrid from "./guess-grid.svelte";
+  import NotePopup from "./note-popup.svelte";
   import StatsDisplay from "./stats-display.svelte";
 
-  let mode = $state("daily");
+  let mode = $state("weekly");
   let game = $state(null);
   let loading = $state(true);
   let error = $state(null);
   let stats = $state(null);
+  let period = $state(null);
 
   let excludeNames = $derived(game ? game.guesses.map((g) => g.name) : []);
 
+  // { text, trigger, openedBy, id }
+  let bubble = $state(null);
+
+  const noteBubble = {
+    isOpenFor(id) {
+      return Boolean(bubble && bubble.id === id);
+    },
+    open(trigger, notes, openedBy, id) {
+      const text = pickNote(notes);
+      if (!text) return;
+      bubble = { text, trigger, openedBy, id };
+    },
+    close(openedBy) {
+      // A hover leaving does not close a bubble that a click pinned open.
+      if (!bubble) return;
+      if (openedBy && bubble.openedBy !== openedBy) return;
+      bubble = null;
+    },
+    toggle(trigger, notes, id) {
+      if (bubble && bubble.id === id) {
+        // Clicking a hover-opened bubble pins it rather than closing it,
+        // which is what makes the tap-then-click sequence on hybrid devices
+        // behave.
+        if (bubble.openedBy === "click") {
+          bubble = null;
+          return;
+        }
+        bubble = { ...bubble, openedBy: "click" };
+        return;
+      }
+      const text = pickNote(notes);
+      if (!text) return;
+      bubble = { text, trigger, openedBy: "click", id };
+    },
+  };
+
+  function dismissBubble({ restoreFocus = false } = {}) {
+    const trigger = bubble?.trigger;
+    bubble = null;
+    if (restoreFocus) trigger?.focus();
+  }
+
   function initGame(gameMode) {
     const seed =
-      gameMode === "daily" ? getTodaySeed() : getOrCreateUnlimitedSeed();
-    const target = getRandomCampaign(seed);
-    const maxGuesses = gameMode === "daily" ? 6 : 0;
+      gameMode === "unlimited" ? getOrCreateUnlimitedSeed() : period.seed;
+    const target =
+      gameMode === "unlimited"
+        ? getCampaignForSeed(seed)
+        : getCampaignForPeriod(period.index);
+    const maxGuesses = gameMode === "unlimited" ? 0 : 6;
 
     game = createGame({
       target,
@@ -49,8 +98,11 @@
   onMount(async () => {
     try {
       await loadCampaigns();
-      clearExpiredCache(getTodaySeed());
-      initGame("daily");
+      // Resolved once and reused. Two calls straddling the boundary would
+      // sweep the new period's key and then start the old period's game.
+      period = getCurrentPeriod();
+      clearExpiredCache(period.seed);
+      initGame("weekly");
     } catch (err) {
       error = err.message;
     } finally {
@@ -99,13 +151,13 @@
     class="flex justify-center gap-1 my-3 bg-[var(--color-surface)] rounded-lg p-1 w-fit mx-auto"
   >
     <button
-      onclick={() => switchMode("daily")}
+      onclick={() => switchMode("weekly")}
       class="px-5 py-2 rounded-md border-none text-sm font-medium cursor-pointer transition-all {mode ===
-      'daily'
+      'weekly'
         ? 'bg-[var(--color-accent)] text-[var(--color-text)]'
         : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]'}"
     >
-      Quotidien
+      Hebdomadaire
     </button>
     <button
       onclick={() => switchMode("unlimited")}
@@ -134,7 +186,7 @@
       : `${game.guesses.length} essai${game.guesses.length > 1 ? "s" : ""}`}
   </p>
 
-  <GuessGrid guesses={game.guesses} results={game.results} />
+  <GuessGrid guesses={game.guesses} results={game.results} {noteBubble} />
 
   {#if game.isOver}
     <GameOver
@@ -142,6 +194,13 @@
       target={game.target}
       guessCount={game.guesses.length}
       onNewGame={mode === "unlimited" ? handleNewGame : undefined}
+      endsAt={mode === "unlimited" ? undefined : period.endsAt}
     />
   {/if}
+
+  <!--
+    Rendered here, outside GuessGrid, on purpose — see the comment in
+    note-popup.svelte. Moving it inside the grid breaks it silently.
+  -->
+  <NotePopup {bubble} onDismiss={dismissBubble} />
 {/if}

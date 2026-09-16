@@ -3,7 +3,7 @@
   import GuessRow from "./guess-row.svelte";
 
   /** Grid with header row + guess rows */
-  let { guesses, results } = $props();
+  let { guesses, results, noteBubble } = $props();
 
   // Newest guess first. .reverse() acts on the fresh array from .map(),
   // so `guesses` itself is never mutated.
@@ -31,6 +31,6 @@
 
   <!-- Guess rows — newest first -->
   {#each rows as row (row.campaign.id)}
-    <GuessRow campaign={row.campaign} results={row.results} />
+    <GuessRow campaign={row.campaign} results={row.results} {noteBubble} />
   {/each}
 </div>

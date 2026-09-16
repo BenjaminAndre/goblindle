@@ -1,8 +1,9 @@
 <script>
   import CampaignAvatar from "./campaign-avatar.svelte";
+  import Countdown from "./countdown.svelte";
 
-  /** Win/loss message with optional new game button */
-  let { isWon, target, guessCount, onNewGame } = $props();
+  /** Win/loss message, with a countdown in weekly mode and a button in unlimited */
+  let { isWon, target, guessCount, onNewGame, endsAt } = $props();
 </script>
 
 <div class="text-center py-6 px-4 mx-auto max-w-[400px]">
@@ -39,5 +40,8 @@
     >
       Nouvelle partie
     </button>
+  {:else if endsAt}
+    <!-- Weekly mode has no replay, so this panel is on screen for up to a week. -->
+    <Countdown {endsAt} />
   {/if}
 </div>

@@ -2,7 +2,7 @@
 
 const STORAGE_KEY_PREFIX = "goblindle_v1_";
 /** Prefixes from earlier versions, swept on load so their state can never be restored. */
-const STALE_KEY_PREFIXES = ["loldle_"];
+const STALE_KEY_PREFIXES = ["loldle_", `${STORAGE_KEY_PREFIX}daily_`];
 const UNLIMITED_SEED_KEY = `${STORAGE_KEY_PREFIX}unlimited_seed`;
 
 /**
@@ -11,11 +11,11 @@ const UNLIMITED_SEED_KEY = `${STORAGE_KEY_PREFIX}unlimited_seed`;
  * @param {Object} config.target - Target campaign to guess
  * @param {Function} config.compareFn - (guess, target) => comparison results
  * @param {number} config.maxGuesses - Max allowed guesses (0 = unlimited)
- * @param {string} config.mode - "daily" or "unlimited"
+ * @param {string} config.mode - "weekly" or "unlimited"
  * @param {string} config.seed - Seed string for mode
  */
 export function createGame(config) {
-  const { target, compareFn, maxGuesses = 6, mode = "daily", seed = "" } = config;
+  const { target, compareFn, maxGuesses = 6, mode = "weekly", seed = "" } = config;
 
   // Try to restore saved state
   const saved = loadState(mode, seed);
@@ -173,20 +173,20 @@ function loadState(mode, seed) {
   }
 }
 
-/** Remove stale daily entries from localStorage (keeps only today's) */
-export function clearExpiredCache(todaySeed) {
+/** Remove past periods from localStorage (keeps only the current one) */
+export function clearExpiredCache(currentSeed) {
   try {
-    const todayKey = `${STORAGE_KEY_PREFIX}daily_${todaySeed}`;
+    const currentKey = `${STORAGE_KEY_PREFIX}weekly_${currentSeed}`;
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (!key) continue;
-      const isStaleDaily =
-        key.startsWith(`${STORAGE_KEY_PREFIX}daily_`) && key !== todayKey;
-      // Old prefixes go too — clearExpiredCache only ever swept its own, so
-      // pre-rename keys would otherwise sit in localStorage forever.
+      const isPastPeriod =
+        key.startsWith(`${STORAGE_KEY_PREFIX}weekly_`) && key !== currentKey;
+      // Retired key shapes go too — the sweep only ever covered its own, so
+      // anything written before a rename would sit in localStorage forever.
       const isLegacy = STALE_KEY_PREFIXES.some((p) => key.startsWith(p));
-      if (isStaleDaily || isLegacy) keysToRemove.push(key);
+      if (isPastPeriod || isLegacy) keysToRemove.push(key);
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
   } catch {
@@ -194,7 +194,16 @@ export function clearExpiredCache(todaySeed) {
   }
 }
 
+/**
+ * Unlimited is the special case, and it is the one named explicitly.
+ *
+ * The polarity matters: with the seeded branch as the fallthrough, an unknown
+ * mode gets its own key. The other way round it would land on
+ * unlimited_current, silently sharing state with the unlimited game and being
+ * wiped by clearUnlimitedState — which reads as "my progress vanishes
+ * sometimes", not as a crash.
+ */
 function getStorageKey(mode, seed) {
-  if (mode === "daily") return `${STORAGE_KEY_PREFIX}daily_${seed}`;
-  return `${STORAGE_KEY_PREFIX}unlimited_current`;
+  if (mode === "unlimited") return `${STORAGE_KEY_PREFIX}unlimited_current`;
+  return `${STORAGE_KEY_PREFIX}weekly_${seed}`;
 }

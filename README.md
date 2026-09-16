@@ -39,16 +39,31 @@ optional entirely:
   not an omitted field.
 - Optional illustrations go in `web/static/img/campaigns/`, and `image.value` is
   just the filename. Campaigns without one get a tile showing their initials.
-- `notes` are not displayed yet. They are carried through to the app keyed by
-  field, ready for the per-cell hover bubble planned for v0.2.
+- `notes` show up as a "?" bubble on that field's cell, one anecdote picked at
+  random each time it opens. A field with no notes gets no bubble, so the
+  affordance never promises something that isn't there. Write one note per
+  entry in the array; several on the same field means the bubble varies.
 
 Campaign names must be distinct even after accents and punctuation are stripped
 — "La Quête du Roi" and "La Quete du Roi" collide. The app refuses to start on a
 duplicate rather than breaking mid-game, so you will see the problem
 immediately.
 
-Adding a campaign changes the rotation, which changes today's answer and resets
-any game already in progress. Edit between days rather than mid-day.
+## The weekly rotation
+
+The campaign changes every **Thursday at 19:00, Europe/Brussels** — just before
+a session. The zone is fixed rather than the player's own, so everyone gets the
+same campaign at the same moment, and a player abroad is not out of step. The
+schedule lives in [`web/src/lib/schedule.js`](./web/src/lib/schedule.js); moving
+the day or the hour means moving the anchor constant there.
+
+Each campaign comes up exactly once per rotation, so with 16 campaigns the whole
+set is used in 16 weeks before any repeat. A longer list means a longer cycle —
+and more anecdotes to show.
+
+Adding or removing a campaign reshuffles the rotation, which changes the current
+answer and resets any game in progress. Edit between Thursdays rather than
+mid-week.
 
 ## Adding an attribute
 

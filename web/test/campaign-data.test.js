@@ -1,9 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  getCampaignImageUrl,
-  getCampaignInitials,
-  getTodaySeed,
-} from "$lib/campaign-data";
+import { describe, expect, it, vi } from "vitest";
+import { getCampaignImageUrl, getCampaignInitials } from "$lib/campaign-data";
 import {
   CAMPAIGNS,
   RAW_CAMPAIGNS,
@@ -284,74 +280,55 @@ describe("searchCampaigns", () => {
   });
 });
 
-describe("getRandomCampaign", () => {
-  const DAY_MS = 86400000;
-
-  function seedForDay(day) {
-    return new Date(day * DAY_MS).toISOString().slice(0, 10);
+describe("getCampaignForPeriod", () => {
+  /** Period indices 0, 1, 2, … — one per week, which is what the cycle needs. */
+  function indices(count, from = 0) {
+    return Array.from({ length: count }, (_, i) => from + i);
   }
 
-  /** Days since the epoch for the first day of the cycle covering 2026-01-01. */
-  function cycleStart(n) {
-    return Math.ceil(Date.UTC(2026, 0, 1) / DAY_MS / n) * n;
-  }
-
-  /** Daily seeds for `count` consecutive days from a cycle boundary. */
-  function consecutiveSeeds(count, n = CAMPAIGNS.length) {
-    const start = cycleStart(n);
-    return Array.from({ length: count }, (_, i) => seedForDay(start + i));
-  }
-
-  it("is deterministic for a given seed", async () => {
+  it("is deterministic for a given index", async () => {
     const { mod } = await loadedModule();
-    expect(mod.getRandomCampaign("2026-07-25")).toBe(
-      mod.getRandomCampaign("2026-07-25"),
-    );
+    expect(mod.getCampaignForPeriod(29)).toBe(mod.getCampaignForPeriod(29));
   });
 
   it("always returns a campaign from the loaded list", async () => {
     const { mod } = await loadedModule();
-    for (const seed of ["a", "b", "2026-07-25", "unlimited_1_0.5", ""]) {
-      expect(CAMPAIGNS).toContainEqual(mod.getRandomCampaign(seed));
+    for (const index of [0, 1, 29, 42, 500]) {
+      expect(CAMPAIGNS).toContainEqual(mod.getCampaignForPeriod(index));
     }
   });
 
   it("returns null before campaigns are loaded", async () => {
     const { mod } = await freshModule();
-    expect(mod.getRandomCampaign("2026-07-25")).toBeNull();
+    expect(mod.getCampaignForPeriod(0)).toBeNull();
   });
 
   it("uses every campaign exactly once per cycle", async () => {
     const { mod } = await loadedModule();
     const n = CAMPAIGNS.length;
-    // Anchored to a cycle boundary — an arbitrary n-day window straddles two
-    // cycles and would legitimately repeat.
-    const names = consecutiveSeeds(n).map((s) => mod.getRandomCampaign(s).name);
+    const names = indices(n).map((i) => mod.getCampaignForPeriod(i).name);
     expect(new Set(names).size).toBe(n);
   });
 
   it("uses every campaign exactly once in the next cycle too", async () => {
     const { mod } = await loadedModule();
     const n = CAMPAIGNS.length;
-    const names = consecutiveSeeds(2 * n)
-      .slice(n)
-      .map((s) => mod.getRandomCampaign(s).name);
+    const names = indices(n, n).map((i) => mod.getCampaignForPeriod(i).name);
     expect(new Set(names).size).toBe(n);
   });
 
-  it("never repeats on consecutive days", async () => {
+  it("never repeats on consecutive periods", async () => {
     const { mod } = await loadedModule();
-    const seeds = consecutiveSeeds(200);
-    const names = seeds.map((s) => mod.getRandomCampaign(s).name);
+    const names = indices(200).map((i) => mod.getCampaignForPeriod(i).name);
     const repeats = names.filter((name, i) => i > 0 && name === names[i - 1]);
     expect(repeats).toEqual([]);
   });
 
   /**
-   * Regression test for the plain `djb2(seed) % n` selector: djb2 XORs the last
-   * character last, so consecutive dates hashed to adjacent values and the
+   * Regression test for a plain `hash(index) % n` selector: djb2 XORs the last
+   * character last, so consecutive indices hashed to adjacent values and the
    * modulo preserved it — the answer marched straight down the file, a
-   * different campaign each day but in file order.
+   * different campaign each period but in file order.
    */
   it("does not march through the list in file order", async () => {
     const { mod } = await loadedModule(
@@ -359,72 +336,66 @@ describe("getRandomCampaign", () => {
     );
     const list = await mod.loadCampaigns();
     const indexOf = (name) => list.findIndex((c) => c.name === name);
-    const seeds = consecutiveSeeds(200, list.length);
-    const indices = seeds.map((s) => indexOf(mod.getRandomCampaign(s).name));
-
-    const adjacent = indices.filter(
-      (idx, i) => i > 0 && Math.abs(idx - indices[i - 1]) === 1,
+    const positions = indices(200).map((i) =>
+      indexOf(mod.getCampaignForPeriod(i).name),
     );
-    expect(adjacent.length).toBeLessThan(indices.length / 3);
+
+    const adjacent = positions.filter(
+      (idx, i) => i > 0 && Math.abs(idx - positions[i - 1]) === 1,
+    );
+    expect(adjacent.length).toBeLessThan(positions.length / 3);
+  });
+
+  /**
+   * A device whose clock is set before the anchor produces a negative index.
+   * Without the euclidean modulo this indexes past the start of the array and
+   * the resulting undefined throws on `.name`, inside onMount, where it
+   * surfaces as a data-loading failure.
+   */
+  it("handles a negative index", async () => {
+    const { mod } = await loadedModule();
+    for (const index of [-1, -3, -17, -200]) {
+      expect(CAMPAIGNS).toContainEqual(mod.getCampaignForPeriod(index));
+    }
+  });
+
+  /** Cycle 0 compares against "goblindle-cycle--1" — a phantom, but a valid seed. */
+  it("survives the phantom cycle before the first one", async () => {
+    const { mod } = await loadedModule();
+    expect(CAMPAIGNS).toContainEqual(mod.getCampaignForPeriod(0));
   });
 
   it("handles a list too short to shuffle", async () => {
     const { mod } = await loadedModule(named(["Seule"]));
-    const seeds = consecutiveSeeds(5, 1);
-    expect(seeds.map((s) => mod.getRandomCampaign(s).name)).toEqual(
-      Array(5).fill("Seule"),
-    );
+    const names = indices(5).map((i) => mod.getCampaignForPeriod(i).name);
+    expect(names).toEqual(Array(5).fill("Seule"));
   });
 
   it("alternates rather than repeating with only two campaigns", async () => {
     const { mod } = await loadedModule(named(["Une", "Deux"]));
-    const names = consecutiveSeeds(10, 2).map(
-      (s) => mod.getRandomCampaign(s).name,
-    );
+    const names = indices(10).map((i) => mod.getCampaignForPeriod(i).name);
     const repeats = names.filter((name, i) => i > 0 && name === names[i - 1]);
     expect(repeats).toEqual([]);
   });
-
-  it("still selects for a non-date seed, as unlimited mode passes", async () => {
-    const { mod } = await loadedModule();
-    const picked = mod.getRandomCampaign("unlimited_1717171717_0.42");
-    expect(CAMPAIGNS).toContainEqual(picked);
-  });
 });
 
-describe("getTodaySeed", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
+describe("getCampaignForSeed", () => {
+  it("is deterministic for a given seed", async () => {
+    const { mod } = await loadedModule();
+    const seed = "unlimited_1717171717_0.42";
+    expect(mod.getCampaignForSeed(seed)).toBe(mod.getCampaignForSeed(seed));
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
+  it("always returns a campaign from the loaded list", async () => {
+    const { mod } = await loadedModule();
+    for (const seed of ["a", "b", "unlimited_1_0.5", "2026-07-23", ""]) {
+      expect(CAMPAIGNS).toContainEqual(mod.getCampaignForSeed(seed));
+    }
   });
 
-  it("formats as YYYY-MM-DD", () => {
-    vi.setSystemTime(new Date("2026-07-25T09:00:00Z"));
-    expect(getTodaySeed()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-  });
-
-  it("reflects the local date, not the UTC date", () => {
-    // 18:00 UTC is already the next day in UTC+7 and still the same day in UTC,
-    // so this instant fails any implementation that reaches for UTC getters.
-    vi.setSystemTime(new Date("2026-07-25T18:00:00Z"));
-    // en-CA renders as YYYY-MM-DD — an independent derivation of the same date.
-    expect(getTodaySeed()).toBe(new Date().toLocaleDateString("en-CA"));
-  });
-
-  it("zero-pads single-digit months and days", () => {
-    vi.setSystemTime(new Date(2026, 0, 5, 12, 0, 0));
-    expect(getTodaySeed()).toBe("2026-01-05");
-  });
-
-  it("advances by one day across a local midnight", () => {
-    vi.setSystemTime(new Date(2026, 6, 25, 23, 59, 0));
-    const before = getTodaySeed();
-    vi.setSystemTime(new Date(2026, 6, 26, 0, 1, 0));
-    expect(getTodaySeed()).not.toBe(before);
-    expect(getTodaySeed()).toBe("2026-07-26");
+  it("returns null before campaigns are loaded", async () => {
+    const { mod } = await freshModule();
+    expect(mod.getCampaignForSeed("unlimited_1_0.5")).toBeNull();
   });
 });
 

@@ -158,26 +158,39 @@ export function searchCampaigns(query, excludeNames = []) {
 }
 
 /**
- * Seeded campaign selection (deterministic for the same seed string).
+ * The campaign for a rotation period, by its index (0, 1, 2, … one per week).
  *
- * Daily seeds get a shuffled cycle rather than `hash(seed) % n`: djb2 XORs the
- * last character last, so consecutive dates hash to adjacent values and the
- * modulo preserves that — at these list sizes the plain version walks straight
- * down the file, a different campaign each day but in file order. A cycle gives
- * every campaign exactly once per n days, reshuffled each time around.
+ * A shuffled cycle rather than `hash(index) % n`: djb2 XORs the last character
+ * last, so consecutive indices hash to adjacent values and the modulo preserves
+ * that — at these list sizes the plain version walks straight down the file, a
+ * different campaign each period but in file order. A cycle gives every
+ * campaign exactly once per n periods, reshuffled each time around.
+ *
+ * The index must step by 1 for that to hold. Keying off a date instead, with a
+ * weekly seed stepping by 7, would advance `cycle` mid-rotation and leave the
+ * repeat guard in `cyclePermutation` permanently dead.
  */
-export function getRandomCampaign(seed) {
+export function getCampaignForPeriod(index) {
   if (!campaigns.length) return null;
   const n = campaigns.length;
 
-  const day = daysSinceEpoch(seed);
-  // Unlimited mode passes `unlimited_<ts>_<rand>`, which has no place in the
-  // daily cycle; one well-mixed draw is all it needs.
-  if (day === null) return campaigns[fmix32(hashString(seed)) % n];
-
-  const cycle = Math.floor(day / n);
-  const pos = ((day % n) + n) % n;
+  const cycle = Math.floor(index / n);
+  // Euclidean, not `index % n`: a device whose clock is set before the anchor
+  // gives a negative index, and campaigns[-3].name throws inside onMount, where
+  // it surfaces as a data-loading error and sends you hunting a fetch bug.
+  const pos = ((index % n) + n) % n;
   return campaigns[cyclePermutation(n, cycle)[pos]];
+}
+
+/**
+ * The campaign for an arbitrary seed string, for unlimited mode.
+ *
+ * One well-mixed draw — no cycle, no repeat avoidance, because unlimited games
+ * have no sequence to speak of.
+ */
+export function getCampaignForSeed(seed) {
+  if (!campaigns.length) return null;
+  return campaigns[fmix32(hashString(String(seed))) % campaigns.length];
 }
 
 /**
@@ -199,20 +212,15 @@ function cyclePermutation(n, cycle) {
   if (n < 3) return Array.from({ length: n }, (_, i) => i);
 
   const perm = shuffledIndices(n, `goblindle-cycle-${cycle}`);
+  // At cycle 0 this asks for "goblindle-cycle--1". The double hyphen looks like
+  // a bug and is not: it is a valid seed for a cycle that is simply never
+  // drawn, so the comparison below is against a phantom. Deterministic, and
+  // cheaper than special-casing the first cycle.
   const previous = shuffledIndices(n, `goblindle-cycle-${cycle - 1}`);
   if (perm[0] === previous[n - 1]) {
     [perm[0], perm[1]] = [perm[1], perm[0]];
   }
   return perm;
-}
-
-/** Days since the Unix epoch for a YYYY-MM-DD seed, or null if it isn't one. */
-function daysSinceEpoch(seed) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(seed));
-  if (!match) return null;
-  const ms = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-  if (Number.isNaN(ms)) return null;
-  return Math.floor(ms / 86400000);
 }
 
 /** Fisher-Yates over [0..n), seeded so the permutation is reproducible. */
@@ -253,15 +261,6 @@ function mulberry32(a) {
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-/** Get today's local date string for daily seed */
-export function getTodaySeed() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
 }
 
 /**
