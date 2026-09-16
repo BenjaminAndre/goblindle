@@ -13,10 +13,17 @@
     clearUnlimitedState,
     createGame,
     getOrCreateUnlimitedSeed,
+    hasAbandonedPeriod,
     loadUnlimitedStats,
     saveUnlimitedStats,
     submitGuess,
   } from "$lib/game-engine";
+  import {
+    breakStreak,
+    loadStreak,
+    nextStreak,
+    saveStreak,
+  } from "$lib/streak";
   import CampaignSearch from "./campaign-search.svelte";
   import GameOver from "./game-over.svelte";
   import GuessGrid from "./guess-grid.svelte";
@@ -29,6 +36,7 @@
   let error = $state(null);
   let stats = $state(null);
   let period = $state(null);
+  let streak = $state(null);
 
   let excludeNames = $derived(game ? game.guesses.map((g) => g.name) : []);
 
@@ -101,6 +109,13 @@
       // Resolved once and reused. Two calls straddling the boundary would
       // sweep the new period's key and then start the old period's game.
       period = getCurrentPeriod();
+
+      // Read before the sweep: clearExpiredCache deletes exactly the past-period
+      // keys that record an abandoned week.
+      const stored = loadStreak();
+      streak = hasAbandonedPeriod(period.seed) ? breakStreak(stored) : stored;
+      if (streak !== stored) saveStreak(streak);
+
       clearExpiredCache(period.seed);
       initGame("weekly");
     } catch (err) {
@@ -129,6 +144,13 @@
       saveUnlimitedStats(updated);
       stats = loadUnlimitedStats();
     }
+
+    // Guarded on updated.mode, not the component's `mode`: they agree today,
+    // and that is exactly the sort of thing that quietly stops agreeing.
+    if (updated.isOver && updated.mode === "weekly") {
+      streak = nextStreak(streak, period.index, updated.isWon);
+      saveStreak(streak);
+    }
   }
 
   function handleNewGame() {
@@ -154,7 +176,7 @@
       onclick={() => switchMode("weekly")}
       class="px-5 py-2 rounded-md border-none text-sm font-medium cursor-pointer transition-all {mode ===
       'weekly'
-        ? 'bg-[var(--color-accent)] text-[var(--color-text)]'
+        ? 'bg-[var(--color-action)] text-[var(--color-bg)]'
         : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]'}"
     >
       Hebdomadaire
@@ -163,7 +185,7 @@
       onclick={() => switchMode("unlimited")}
       class="px-5 py-2 rounded-md border-none text-sm font-medium cursor-pointer transition-all {mode ===
       'unlimited'
-        ? 'bg-[var(--color-accent)] text-[var(--color-text)]'
+        ? 'bg-[var(--color-action)] text-[var(--color-bg)]'
         : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-hover)]'}"
     >
       Illimité
@@ -195,6 +217,9 @@
       guessCount={game.guesses.length}
       onNewGame={mode === "unlimited" ? handleNewGame : undefined}
       endsAt={mode === "unlimited" ? undefined : period.endsAt}
+      streak={mode === "unlimited" || streak?.lastPeriod !== period.index
+        ? undefined
+        : streak}
     />
   {/if}
 

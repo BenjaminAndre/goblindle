@@ -151,38 +151,46 @@ describe("formatBoundaryDate", () => {
 });
 
 describe("formatCountdown", () => {
-  it("shows days, hours and minutes when more than a day remains", () => {
-    expect(formatCountdown(2 * 86_400_000 + 5 * HOUR + 13 * 60_000)).toBe(
-      "2 j 05 h 13 min",
+  it("renders days, hours, minutes and seconds, always all four", () => {
+    expect(formatCountdown(2 * 86_400_000 + 5 * HOUR + 13 * 60_000 + 22_000)).toBe(
+      "02-05:13:22",
     );
   });
 
-  it("shows hours and minutes under a day", () => {
-    expect(formatCountdown(5 * HOUR + 13 * 60_000)).toBe("5 h 13 min");
+  it("keeps the leading fields at zero rather than dropping them", () => {
+    expect(formatCountdown(5 * HOUR + 13 * 60_000)).toBe("00-05:13:00");
+    expect(formatCountdown(13 * 60_000 + 22_000)).toBe("00-00:13:22");
+    expect(formatCountdown(22_000)).toBe("00-00:00:22");
   });
 
-  it("shows minutes and seconds under an hour", () => {
-    expect(formatCountdown(13 * 60_000 + 22_000)).toBe("13 min 22 s");
+  it("pads every field to two digits", () => {
+    expect(formatCountdown(86_400_000)).toBe("01-00:00:00");
+    expect(formatCountdown(HOUR)).toBe("00-01:00:00");
+    expect(formatCountdown(60_000)).toBe("00-00:01:00");
   });
 
-  it("shows seconds alone under a minute", () => {
-    expect(formatCountdown(22_000)).toBe("22 s");
-  });
-
-  it("pads subordinate units but not the leading one", () => {
-    expect(formatCountdown(86_400_000)).toBe("1 j 00 h 00 min");
-    expect(formatCountdown(HOUR)).toBe("1 h 00 min");
-    expect(formatCountdown(60_000)).toBe("1 min 00 s");
+  /** Fixed width is the point of the format — it ticks every second for a week. */
+  it("is always 11 characters wide", () => {
+    for (const ms of [0, 999, 60_000, HOUR, 86_400_000, 6 * 86_400_000 + 1]) {
+      expect(formatCountdown(ms)).toHaveLength(11);
+    }
   });
 
   it("floors rather than rounding, so 59.6s never renders as 60", () => {
-    expect(formatCountdown(59_999)).toBe("59 s");
-    expect(formatCountdown(3_599_999)).toBe("59 min 59 s");
+    expect(formatCountdown(59_999)).toBe("00-00:00:59");
+    expect(formatCountdown(3_599_999)).toBe("00-00:59:59");
+    expect(formatCountdown(86_399_999)).toBe("00-23:59:59");
   });
 
   it("clamps zero and negatives", () => {
-    expect(formatCountdown(0)).toBe("0 s");
-    expect(formatCountdown(999)).toBe("0 s");
-    expect(formatCountdown(-5000)).toBe("0 s");
+    expect(formatCountdown(0)).toBe("00-00:00:00");
+    expect(formatCountdown(999)).toBe("00-00:00:00");
+    expect(formatCountdown(-5000)).toBe("00-00:00:00");
+  });
+
+  /** Unreachable in situ — the remainder is capped at one period — but this is
+   * an exported function, and truncating would be worse than growing. */
+  it("grows past two digits of days rather than truncating", () => {
+    expect(formatCountdown(100 * 86_400_000)).toBe("100-00:00:00");
   });
 });

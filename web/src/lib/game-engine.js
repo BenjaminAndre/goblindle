@@ -1,8 +1,12 @@
 // Mode-agnostic game state machine with localStorage persistence
 
-const STORAGE_KEY_PREFIX = "goblindle_v1_";
-/** Prefixes from earlier versions, swept on load so their state can never be restored. */
-const STALE_KEY_PREFIXES = ["loldle_", `${STORAGE_KEY_PREFIX}daily_`];
+const STORAGE_KEY_PREFIX = "goblindle_v3_";
+/**
+ * Prefixes from earlier versions, swept on load so their state can never be
+ * restored. v0.3 drops backward compatibility outright: games in progress and
+ * unlimited statistics from v0.1 and v0.2 are discarded on first load.
+ */
+const STALE_KEY_PREFIXES = ["loldle_", "goblindle_v1_"];
 const UNLIMITED_SEED_KEY = `${STORAGE_KEY_PREFIX}unlimited_seed`;
 
 /**
@@ -171,6 +175,37 @@ function loadState(mode, seed) {
   } catch {
     return null;
   }
+}
+
+/**
+ * Whether a past period was started and never finished.
+ *
+ * saveState only ever runs from submitGuess, so a key existing at all means at
+ * least one guess was made — an unfinished one is an abandoned week.
+ *
+ * Must be called BEFORE clearExpiredCache, which deletes precisely the keys
+ * this reads. That ordering is the whole subtlety.
+ */
+export function hasAbandonedPeriod(currentSeed) {
+  try {
+    const currentKey = `${STORAGE_KEY_PREFIX}weekly_${currentSeed}`;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key) continue;
+      if (!key.startsWith(`${STORAGE_KEY_PREFIX}weekly_`)) continue;
+      if (key === currentKey) continue;
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(key));
+        if (saved && !saved.isOver) return true;
+      } catch {
+        // A corrupt entry says nothing about whether the week was finished.
+      }
+    }
+  } catch {
+    // Ignore
+  }
+  return false;
 }
 
 /** Remove past periods from localStorage (keeps only the current one) */

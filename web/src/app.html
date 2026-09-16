@@ -3,6 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#170a06" />
+    <!--
+      %sveltekit.assets% rather than a leading slash: the site is served from
+      /<repo>/ on GitHub Pages, where an absolute path 404s while working
+      perfectly in dev.
+    -->
+    <link rel="icon" href="%sveltekit.assets%/logo.png" type="image/png" />
+    <link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png" />
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">

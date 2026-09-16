@@ -4,6 +4,64 @@ Toutes les évolutions notables du projet. Format inspiré de
 [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), la version la plus
 récente en premier.
 
+## [0.3.0] — 2026-09-16
+
+### ⚠ Rupture de compatibilité
+
+Le préfixe de stockage passe à `goblindle_v3_`. Au premier chargement après la
+mise à jour, **toute partie en cours et toutes les statistiques du mode Illimité
+sont effacées**. C'est volontaire : cela permet une disposition des clés simple
+plutôt que défensive.
+
+### Ajouté
+
+- **Série hebdomadaire.** L'écran de fin affiche le nombre de semaines gagnées
+  d'affilée, avec un message qui évolue à 10, 15, 20, 50, 100 et 200 semaines.
+  Deux règles, rappelées sous le message parce qu'elles ne se devinent pas :
+  **passer une semaine ne casse rien** — la série gèle — mais **abandonner une
+  partie commencée la casse**, pour que personne ne protège sa série en
+  s'arrêtant au cinquième essai. Une semaine abandonnée est détectée au
+  chargement suivant, avant le nettoyage des parties passées.
+- **Le logo du club** en icône d'onglet et à côté du titre. Icône iOS séparée,
+  aplatie sur fond clair : iOS compose la transparence sur du noir, et le logo
+  est presque entièrement sombre.
+- `color-scheme: dark`, qui manquait : les ascenseurs, les anneaux de focus par
+  défaut, le remplissage automatique de Chrome et `::selection` étaient rendus
+  en clair sur une page sombre.
+
+### Modifié
+
+- **Palette alignée sur le logo** — bruns maroon très sombres et blanc cassé
+  chaud, échantillonnés dans l'image. Polices, arrondis et tailles inchangés.
+  Le vert et le rouge des cellules ne bougent pas : c'est le langage du jeu.
+- Le décompte s'affiche en `dd-hh:mm:ss`, largeur fixe.
+- Les boutons passent au blanc cassé du logo plutôt qu'à un orange de marque :
+  toute teinte chaude se confondrait avec le rouge des cellules, et la vignette
+  d'initiales s'affiche à quatre pixels d'une cellule dans la grille.
+- La bordure du champ de recherche et l'accent ne partagent plus la même valeur.
+  C'est ce qui rendait l'indicateur de focus invisible : il était exactement de
+  la couleur de la bordure au repos.
+
+### Corrigé
+
+- **Texte blanc sur les cellules rouges : 3,77:1, sous le seuil WCAG AA** depuis
+  toujours, et pire encore en 0,7 rem sur mobile. Les trois cellules ont
+  désormais un texte sombre, à 5,14:1 sur le rouge.
+- Le « ? » des anecdotes était affiché à 55 % d'opacité et devenait illisible sur
+  les cellules — 2,13:1 sur le rouge — alors que c'est le seul indice qu'une
+  case est cliquable.
+- L'ombre portée de la bulle d'anecdote était du noir à 45 % sur une page
+  quasi noire, donc invisible. Remplacée par un liseré clair.
+- Suppression de `--color-partial` et de `.cell-partial` : `compareCampaigns` ne
+  renvoie plus que `correct` ou `wrong` depuis la v0.1, la règle ne s'appliquait
+  jamais.
+
+### Limites connues
+
+- La série est stockée dans le `localStorage` du navigateur : elle ne survit pas
+  à un vidage du cache, ne suit pas d'un appareil à l'autre, et n'existe pas en
+  navigation privée.
+
 ## [0.2.0] — 2026-09-16
 
 ### Ajouté

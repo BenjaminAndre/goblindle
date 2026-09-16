@@ -52,7 +52,7 @@
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
     <a {href}
       onclick={() => (showFallback = true)}
-      class="inline-block px-5 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-text)] font-semibold no-underline cursor-pointer transition-opacity hover:opacity-85"
+      class="inline-block px-5 py-2.5 rounded-lg bg-[var(--color-action)] text-[var(--color-bg)] font-semibold no-underline cursor-pointer transition-opacity hover:opacity-85"
     >
       Nous écrire
     </a>

@@ -4,6 +4,7 @@ import {
   clearUnlimitedState,
   createGame,
   getOrCreateUnlimitedSeed,
+  hasAbandonedPeriod,
   loadUnlimitedStats,
   saveUnlimitedStats,
   submitGuess,
@@ -139,14 +140,14 @@ describe("submitGuess", () => {
 });
 
 describe("persistence — storage key contract", () => {
-  it("writes weekly state to exactly goblindle_v1_weekly_<seed>", () => {
+  it("writes weekly state to exactly goblindle_v3_weekly_<seed>", () => {
     submitGuess(weekly(), OMBRES);
-    expect(localStorage.getItem("goblindle_v1_weekly_2026-07-23")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_weekly_2026-07-23")).not.toBeNull();
   });
 
-  it("writes unlimited state to exactly goblindle_v1_unlimited_current", () => {
+  it("writes unlimited state to exactly goblindle_v3_unlimited_current", () => {
     submitGuess(unlimited(), OMBRES);
-    expect(localStorage.getItem("goblindle_v1_unlimited_current")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_current")).not.toBeNull();
   });
 
   /**
@@ -157,19 +158,19 @@ describe("persistence — storage key contract", () => {
    */
   it("gives an unknown mode its own key rather than the unlimited one", () => {
     submitGuess(weekly({ mode: "bogus", seed: "x" }), OMBRES);
-    expect(localStorage.getItem("goblindle_v1_unlimited_current")).toBeNull();
-    expect(localStorage.getItem("goblindle_v1_weekly_x")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_current")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_weekly_x")).not.toBeNull();
   });
 
   it("ignores the seed when keying unlimited state", () => {
     submitGuess(unlimited({ seed: "unlimited_999" }), OMBRES);
-    expect(localStorage.getItem("goblindle_v1_unlimited_current")).not.toBeNull();
-    expect(localStorage.getItem("goblindle_v1_unlimited_unlimited_999")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_current")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_unlimited_999")).toBeNull();
   });
 
   it("stores the target name, guesses, results and flags", () => {
     submitGuess(weekly(), OMBRES);
-    const saved = JSON.parse(localStorage.getItem("goblindle_v1_weekly_2026-07-23"));
+    const saved = JSON.parse(localStorage.getItem("goblindle_v3_weekly_2026-07-23"));
     expect(saved).toMatchObject({
       targetName: "La Campagne des Gobelins",
       guesses: [OMBRES],
@@ -207,7 +208,7 @@ describe("persistence — restore on createGame", () => {
   });
 
   it("starts fresh when storage holds malformed JSON", () => {
-    localStorage.setItem("goblindle_v1_weekly_2026-07-23", "{not json");
+    localStorage.setItem("goblindle_v3_weekly_2026-07-23", "{not json");
     expect(weekly().guesses).toEqual([]);
   });
 
@@ -220,7 +221,7 @@ describe("persistence — restore on createGame", () => {
   it("recomputes results on restore instead of trusting the saved array", () => {
     submitGuess(weekly(), OMBRES);
 
-    const key = "goblindle_v1_weekly_2026-07-23";
+    const key = "goblindle_v3_weekly_2026-07-23";
     const saved = JSON.parse(localStorage.getItem(key));
     saved.results = [[{ key: "stale", result: "correct" }]];
     localStorage.setItem(key, JSON.stringify(saved));
@@ -231,31 +232,31 @@ describe("persistence — restore on createGame", () => {
 
 describe("clearExpiredCache", () => {
   it("removes a past period but keeps the current one", () => {
-    localStorage.setItem("goblindle_v1_weekly_2026-07-16", "{}");
-    localStorage.setItem("goblindle_v1_weekly_2026-07-23", "{}");
+    localStorage.setItem("goblindle_v3_weekly_2026-07-16", "{}");
+    localStorage.setItem("goblindle_v3_weekly_2026-07-23", "{}");
 
     clearExpiredCache("2026-07-23");
 
-    expect(localStorage.getItem("goblindle_v1_weekly_2026-07-16")).toBeNull();
-    expect(localStorage.getItem("goblindle_v1_weekly_2026-07-23")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_weekly_2026-07-16")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_weekly_2026-07-23")).not.toBeNull();
   });
 
   it("leaves unlimited keys untouched", () => {
-    localStorage.setItem("goblindle_v1_unlimited_current", "{}");
-    localStorage.setItem("goblindle_v1_unlimited_stats", "{}");
-    localStorage.setItem("goblindle_v1_unlimited_seed", "s");
+    localStorage.setItem("goblindle_v3_unlimited_current", "{}");
+    localStorage.setItem("goblindle_v3_unlimited_stats", "{}");
+    localStorage.setItem("goblindle_v3_unlimited_seed", "s");
 
     clearExpiredCache("2026-07-23");
 
-    expect(localStorage.getItem("goblindle_v1_unlimited_current")).not.toBeNull();
-    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).not.toBeNull();
-    expect(localStorage.getItem("goblindle_v1_unlimited_seed")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_current")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_stats")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_seed")).not.toBeNull();
   });
 
   it("removes every past period, not just the first", () => {
-    localStorage.setItem("goblindle_v1_weekly_2026-07-02", "{}");
-    localStorage.setItem("goblindle_v1_weekly_2026-07-09", "{}");
-    localStorage.setItem("goblindle_v1_weekly_2026-07-16", "{}");
+    localStorage.setItem("goblindle_v3_weekly_2026-07-02", "{}");
+    localStorage.setItem("goblindle_v3_weekly_2026-07-09", "{}");
+    localStorage.setItem("goblindle_v3_weekly_2026-07-16", "{}");
 
     clearExpiredCache("2026-07-23");
 
@@ -285,21 +286,70 @@ describe("clearExpiredCache", () => {
   });
 
   /**
-   * The retired shape has to go while the unlimited keys stay: a saved results
-   * array from the daily schema was built against a different rotation, and the
-   * bluntest way to retire it — bumping the shared prefix — would take
-   * unlimited_stats and unlimited_seed down with it.
+   * v0.3 drops backward compatibility: everything under the v1 prefix goes,
+   * including its unlimited statistics, while the current version's own
+   * unlimited keys are untouched.
    */
-  it("sweeps the retired daily shape without touching unlimited state", () => {
-    localStorage.setItem("goblindle_v1_daily_2026-07-23", "{}");
-    localStorage.setItem("goblindle_v1_unlimited_seed", "s");
+  it("sweeps the whole previous version without touching the current one", () => {
+    localStorage.setItem("goblindle_v1_weekly_2026-07-16", "{}");
     localStorage.setItem("goblindle_v1_unlimited_stats", "{}");
+    localStorage.setItem("goblindle_v3_unlimited_seed", "s");
+    localStorage.setItem("goblindle_v3_unlimited_stats", "{}");
 
     clearExpiredCache("2026-07-23");
 
-    expect(localStorage.getItem("goblindle_v1_daily_2026-07-23")).toBeNull();
-    expect(localStorage.getItem("goblindle_v1_unlimited_seed")).not.toBeNull();
-    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v1_weekly_2026-07-16")).toBeNull();
+    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_seed")).not.toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_stats")).not.toBeNull();
+  });
+
+  /**
+   * The streak key must not live under the weekly_ prefix, or this sweep would
+   * delete it on every single load as a non-current period.
+   */
+  it("leaves the streak key alone", () => {
+    localStorage.setItem("goblindle_v3_streak", '{"current":9,"lastPeriod":36}');
+    localStorage.setItem("goblindle_v3_weekly_2026-07-16", "{}");
+
+    clearExpiredCache("2026-07-23");
+
+    expect(localStorage.getItem("goblindle_v3_weekly_2026-07-16")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_streak")).toBe(
+      '{"current":9,"lastPeriod":36}',
+    );
+  });
+});
+
+describe("hasAbandonedPeriod", () => {
+  it("is false when nothing is stored", () => {
+    expect(hasAbandonedPeriod("2026-07-23")).toBe(false);
+  });
+
+  it("ignores the current period, however unfinished", () => {
+    submitGuess(weekly(), OMBRES);
+    expect(hasAbandonedPeriod("2026-07-23")).toBe(false);
+  });
+
+  it("reports a past period that was started and never finished", () => {
+    submitGuess(weekly({ seed: "2026-07-16" }), OMBRES);
+    expect(hasAbandonedPeriod("2026-07-23")).toBe(true);
+  });
+
+  it("does not report a past period that was finished", () => {
+    submitGuess(weekly({ seed: "2026-07-16" }), GOBELINS);
+    expect(hasAbandonedPeriod("2026-07-23")).toBe(false);
+  });
+
+  it("ignores unlimited state and unrelated keys", () => {
+    submitGuess(unlimited(), OMBRES);
+    localStorage.setItem("unrelated", "{}");
+    expect(hasAbandonedPeriod("2026-07-23")).toBe(false);
+  });
+
+  it("treats a corrupt entry as saying nothing", () => {
+    localStorage.setItem("goblindle_v3_weekly_2026-07-16", "{not json");
+    expect(hasAbandonedPeriod("2026-07-23")).toBe(false);
   });
 });
 
@@ -307,7 +357,7 @@ describe("unlimited seed", () => {
   it("creates and persists a seed on first call", () => {
     const seed = getOrCreateUnlimitedSeed();
     expect(seed).toMatch(/^unlimited_/);
-    expect(localStorage.getItem("goblindle_v1_unlimited_seed")).toBe(seed);
+    expect(localStorage.getItem("goblindle_v3_unlimited_seed")).toBe(seed);
   });
 
   it("returns the same seed on subsequent calls", () => {
@@ -320,12 +370,12 @@ describe("unlimited seed", () => {
 
     clearUnlimitedState();
 
-    expect(localStorage.getItem("goblindle_v1_unlimited_current")).toBeNull();
-    expect(localStorage.getItem("goblindle_v1_unlimited_seed")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_current")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_seed")).toBeNull();
   });
 
   it("clearUnlimitedState preserves accumulated stats", () => {
-    localStorage.setItem("goblindle_v1_unlimited_stats", '{"gamesPlayed":3}');
+    localStorage.setItem("goblindle_v3_unlimited_stats", '{"gamesPlayed":3}');
     clearUnlimitedState();
     expect(loadUnlimitedStats().gamesPlayed).toBe(3);
   });
@@ -391,12 +441,12 @@ describe("saveUnlimitedStats", () => {
   it("is a no-op for weekly mode", () => {
     const game = submitGuess(weekly(), GOBELINS);
     saveUnlimitedStats(game);
-    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_stats")).toBeNull();
   });
 
   it("is a no-op for an unfinished game", () => {
     saveUnlimitedStats(submitGuess(unlimited(), OMBRES));
-    expect(localStorage.getItem("goblindle_v1_unlimited_stats")).toBeNull();
+    expect(localStorage.getItem("goblindle_v3_unlimited_stats")).toBeNull();
   });
 });
 
@@ -411,7 +461,7 @@ describe("loadUnlimitedStats", () => {
   });
 
   it("returns zeroed stats when storage holds malformed JSON", () => {
-    localStorage.setItem("goblindle_v1_unlimited_stats", "not json at all");
+    localStorage.setItem("goblindle_v3_unlimited_stats", "not json at all");
     expect(loadUnlimitedStats()).toMatchObject({
       gamesPlayed: 0,
       gamesWon: 0,

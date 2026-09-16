@@ -31,7 +31,7 @@
     <p class="mb-2">Une nouvelle campagne est disponible.</p>
     <button
       onclick={() => location.reload()}
-      class="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-text)] font-semibold cursor-pointer transition-opacity hover:opacity-85"
+      class="px-4 py-2 rounded-lg bg-[var(--color-action)] text-[var(--color-bg)] font-semibold cursor-pointer transition-opacity hover:opacity-85"
     >
       Charger la nouvelle campagne
     </button>

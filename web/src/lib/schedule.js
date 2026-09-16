@@ -90,10 +90,11 @@ export function formatBoundaryDate(instant) {
 }
 
 /**
- * Remaining time, in French. Subordinate units are zero-padded so the string
- * holds its width as it ticks; the leading one is not.
+ * Remaining time as `dd-hh:mm:ss`, every field always present and padded, so
+ * the string holds its width for the whole week it is on screen.
  *
- * j/h/min/s are unit symbols — they never take a plural.
+ * Days pad to two digits but are not truncated past 99 — in situ the remainder
+ * is capped at one period, but this is an exported function with its own tests.
  */
 export function formatCountdown(ms) {
   const total = Math.floor(Math.max(0, ms) / 1000);
@@ -102,10 +103,7 @@ export function formatCountdown(ms) {
   const minutes = Math.floor((total % 3600) / 60);
   const seconds = total % 60;
 
-  if (days > 0) return `${days} j ${pad(hours)} h ${pad(minutes)} min`;
-  if (hours > 0) return `${hours} h ${pad(minutes)} min`;
-  if (minutes > 0) return `${minutes} min ${pad(seconds)} s`;
-  return `${seconds} s`;
+  return `${pad(days)}-${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 function pad(n) {

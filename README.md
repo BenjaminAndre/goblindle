@@ -65,6 +65,17 @@ Adding or removing a campaign reshuffles the rotation, which changes the current
 answer and resets any game in progress. Edit between Thursdays rather than
 mid-week.
 
+## Logo
+
+`logo_gg.png` at the repo root is the master copy of the club badge — 700×691,
+with transparency. It is never deployed: `adapter-static` only copies
+`web/static/`, so it costs nothing at runtime.
+
+`web/static/logo.png` (192×192, the favicon and the header badge) and
+`web/static/apple-touch-icon.png` (180×180, flattened onto the logo's own
+off-white because iOS composites transparency onto black) are **derived from
+it**. Regenerate them from the master, never from each other.
+
 ## Adding an attribute
 
 The guessed attributes are listed once, in
