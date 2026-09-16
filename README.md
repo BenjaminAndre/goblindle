@@ -83,6 +83,16 @@ The guessed attributes are listed once, in
 every campaign in `campaigns.json`, add a matching entry to
 `CLASSIC_ATTRIBUTES`, and the grid column follows automatically.
 
+## Roadmap
+
+Here are some ideas for coming versions : 
+* Share your result. A spoiler-free emoji grid — Goblindle #37 — 4/6 plus the coloured squares — and a copy button. 
+* Weekly stats. Games played, win rate, guess distribution, best streak ever.
+* A second game mode : emojis (also both weekly and unlimited). Guess a game (D&D5e, Fate, Dernière Apocalypse, etc) based on 4 emojis that reveal one after each failed try or all when successfully guessed. If I have the data, I may choose to show how many times it was run as an anecdote (number of campaigns separatly from one shots)
+* A footer with all legally needed data and also contact info and so on
+
+Naturally, all correct data from the club past, with illustrations.
+
 ## License
 
 Apache-2.0 — see [LICENSE](./web/LICENSE).
