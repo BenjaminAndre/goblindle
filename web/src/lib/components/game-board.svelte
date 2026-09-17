@@ -4,6 +4,7 @@
     getCampaignForPeriod,
     getCampaignForSeed,
     loadCampaigns,
+    getCampaignByName,
   } from "$lib/campaign-data";
   import { compareCampaigns } from "$lib/classic-mode";
   import { pickNote } from "$lib/notes";
@@ -91,6 +92,7 @@
       maxGuesses,
       mode: gameMode,
       seed,
+      getCampaignByName,
     });
     stats = gameMode === "unlimited" ? loadUnlimitedStats() : null;
   }

@@ -1,7 +1,5 @@
 // Mode-agnostic game state machine with localStorage persistence
 
-import { getCampaignByName } from "./campaign-data.js";
-
 const STORAGE_KEY_PREFIX = "goblindle_v3_";
 /**
  * Prefixes from earlier versions, swept on load so their state can never be
@@ -19,15 +17,18 @@ const UNLIMITED_SEED_KEY = `${STORAGE_KEY_PREFIX}unlimited_seed`;
  * @param {number} config.maxGuesses - Max allowed guesses; the game stops once this count is reached.
  * @param {string} config.mode - "weekly" or "unlimited"
  * @param {string} config.seed - Seed string for mode
+ * @param {Function} config.getCampaignByName - Optional: (name) => campaign; if provided, used to reconstruct saved guesses
  */
 export function createGame(config) {
-  const { target, compareFn, maxGuesses = 6, mode = "weekly", seed = "" } = config;
+  const { target, compareFn, maxGuesses = 6, mode = "weekly", seed = "", getCampaignByName } = config;
 
   // Try to restore saved state
   const saved = loadState(mode, seed);
   if (saved && saved.targetName === target.name && isValidSavedGame(saved)) {
-    // Reconstruct full campaign objects from names
-    const guesses = saved.guesses.map((g) => getCampaignByName(g.name) || g);
+    // Reconstruct full campaign objects from names if a lookup function was provided
+    const guesses = getCampaignByName
+      ? saved.guesses.map((g) => getCampaignByName(g.name) || g)
+      : saved.guesses;
     return {
       target,
       compareFn,
