@@ -4,7 +4,7 @@
   import { STREAK_RULE, streakMessage } from "$lib/streak";
 
   /** Win/loss message, with a countdown in weekly mode and a button in unlimited */
-  let { isWon, target, guessCount, results, mode, periodIndex, onNewGame, endsAt, streak } = $props();
+  let { isWon, target, guessCount, results, mode, onNewGame, endsAt, streak } = $props();
 
   // undefined in unlimited mode, and when the stored streak belongs to an
   // earlier period than the one just played.
