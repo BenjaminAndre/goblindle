@@ -54,7 +54,7 @@
         return;
       }
     } catch {
-      // Share can fail on some browsers; copy is the fallback.
+      // Ignore unsupported share errors.
     }
 
     try {
@@ -73,7 +73,6 @@
         copied = false;
       }, 1800);
     } catch {
-      // Best-effort fallback: no noisy error on unsupported browsers.
       copied = true;
       window.setTimeout(() => {
         copied = false;
@@ -100,9 +99,7 @@
     </p>
   {:else}
     <p class="text-[var(--color-text-muted)] mb-3">
-      La campagne était <strong class="text-[var(--color-text)]"
-        >{target.name}</strong
-      >
+      La campagne était <strong class="text-[var(--color-text)]">{target.name}</strong>
     </p>
     <div class="flex justify-center">
       <CampaignAvatar campaign={target} size={80} />
@@ -117,7 +114,6 @@
     {copied ? "Résultat copié" : "Partager le résultat"}
   </button>
 
-  <!-- Both branches: a player who has just broken a long run needs this more. -->
   {#if showStreak}
     <div
       class="mt-4 pt-3 border-t border-[var(--color-input-border)] text-[var(--color-text)]"

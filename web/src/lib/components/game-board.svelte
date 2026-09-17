@@ -39,8 +39,6 @@
   let streak = $state(null);
 
   let excludeNames = $derived(game ? game.guesses.map((g) => g.name) : []);
-
-  // { text, trigger, openedBy, id }
   let bubble = $state(null);
 
   const noteBubble = {
@@ -53,16 +51,12 @@
       bubble = { text, trigger, openedBy, id };
     },
     close(openedBy) {
-      // A hover leaving does not close a bubble that a click pinned open.
       if (!bubble) return;
       if (openedBy && bubble.openedBy !== openedBy) return;
       bubble = null;
     },
     toggle(trigger, notes, id) {
       if (bubble && bubble.id === id) {
-        // Clicking a hover-opened bubble pins it rather than closing it,
-        // which is what makes the tap-then-click sequence on hybrid devices
-        // behave.
         if (bubble.openedBy === "click") {
           bubble = null;
           return;
@@ -89,7 +83,7 @@
       gameMode === "unlimited"
         ? getCampaignForSeed(seed)
         : getCampaignForPeriod(period.index);
-    const maxGuesses = gameMode === "unlimited" ? 0 : 6;
+    const maxGuesses = 6;
 
     game = createGame({
       target,
@@ -101,17 +95,11 @@
     stats = gameMode === "unlimited" ? loadUnlimitedStats() : null;
   }
 
-  // Browser-only and once-only by construction: the prerender pass has no
-  // localStorage and no campaigns.json to fetch.
   onMount(async () => {
     try {
       await loadCampaigns();
-      // Resolved once and reused. Two calls straddling the boundary would
-      // sweep the new period's key and then start the old period's game.
       period = getCurrentPeriod();
 
-      // Read before the sweep: clearExpiredCache deletes exactly the past-period
-      // keys that record an abandoned week.
       const stored = loadStreak();
       streak = hasAbandonedPeriod(period.seed) ? breakStreak(stored) : stored;
       if (streak !== stored) saveStreak(streak);
@@ -136,8 +124,6 @@
     const updated = submitGuess(game, campaign);
     if (!updated) return;
 
-    // Always reassign — submitGuess returns new objects, so mutation would
-    // silently lose reactivity.
     game = updated;
 
     if (updated.isOver && updated.mode === "unlimited") {
@@ -145,8 +131,6 @@
       stats = loadUnlimitedStats();
     }
 
-    // Guarded on updated.mode, not the component's `mode`: they agree today,
-    // and that is exactly the sort of thing that quietly stops agreeing.
     if (updated.isOver && updated.mode === "weekly") {
       streak = nextStreak(streak, period.index, updated.isWon);
       saveStreak(streak);
@@ -203,9 +187,7 @@
   />
 
   <p class="text-center text-[var(--color-text-muted)] text-sm my-3">
-    {game.maxGuesses > 0
-      ? `${game.guesses.length} / ${game.maxGuesses} essais`
-      : `${game.guesses.length} essai${game.guesses.length > 1 ? "s" : ""}`}
+    {game.guesses.length} / {game.maxGuesses} essais
   </p>
 
   <GuessGrid guesses={game.guesses} results={game.results} {noteBubble} />
