@@ -170,31 +170,5 @@
     "deaths": {
       "value": 0
     }
-  },
-  {
-    "campaign": {
-      "value": "Dorian Pathfinder"
-    },
-    "gm": {
-      "value": "Dorian"
-    },
-    "game": {
-      "value": "Pathfinder 2e"
-    },
-    "year": {
-      "value": 2025
-    },
-    "pj_max": {
-      "value": 5,
-      "notes": [
-        "Deux changements de joueurs en cours de route, mais le nombre maximum de joueurs est resté à 5."
-      ]
-    },
-    "duration": {
-      "value": 1
-    },
-    "deaths": {
-      "value": 0
-    }
-  }  
+  }
 ]
