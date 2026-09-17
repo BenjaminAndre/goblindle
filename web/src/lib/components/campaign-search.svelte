@@ -8,6 +8,7 @@
   let query = $state("");
   let activeIndex = $state(-1);
   let isOpen = $state(false);
+  let hasInteracted = $state(false);
   // $state because the dropdown is conditionally mounted, so bind:this
   // reassigns these after the initial render.
   let inputEl = $state();
@@ -20,6 +21,7 @@
   // Derived, never assigned from an effect — writing state that the same effect
   // reads is the classic runes loop.
   let isVisible = $derived(isOpen && matches.length > 0);
+  let shouldShowIdleHint = $derived(!disabled && !hasInteracted && query.length === 0);
 
   // Close dropdown on outside click. The element refs are read inside the
   // handler, not during setup, so this registers once like the React effect did.
@@ -37,6 +39,10 @@
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   });
+
+  function markInteracted() {
+    hasInteracted = true;
+  }
 
   function selectCampaign(campaign) {
     query = "";
@@ -79,9 +85,11 @@
       ? `campaign-option-${activeIndex}`
       : undefined}
     bind:value={query}
+    onfocus={markInteracted}
     oninput={() => {
       activeIndex = -1;
       isOpen = true;
+      hasInteracted = true;
     }}
     onkeydown={handleKeyDown}
     {disabled}
@@ -89,6 +97,7 @@
       ? "Partie terminée"
       : "Tapez le nom d'une campagne..."}
     autocomplete="off"
+    class:input-idle-hint={shouldShowIdleHint}
     class="w-full px-4 py-3 rounded-lg bg-[var(--color-input-bg)] border-2 border-[var(--color-input-border)] text-[var(--color-text)] text-base outline-none transition-colors focus:border-[var(--color-focus)] disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-[var(--color-text-muted)]"
   />
 

@@ -45,7 +45,7 @@
       "value": "Donjons & Dragons 5e"
     },
     "year": {
-      "value": 2025,
+      "value": 2024,
       "notes": [
         "Techniquement, l'année 2024-2025, mais la campagne a commencé au Q2."
       ]
@@ -74,7 +74,7 @@
       "value": "Fabula Ultima"
     },
     "year": {
-      "value": 2025
+      "value": 2024
     },
     "pj_max": {
       "value": 5,
@@ -166,6 +166,196 @@
     },
     "duration": {
       "value": 1
+    },
+    "deaths": {
+      "value": 0
+    }
+  },
+  {
+    "campaign": {
+      "value": "Arthur D&D 2022"
+    },
+    "gm": {
+      "value": "Arthur"
+    },
+    "game": {
+      "value": "Donjons & Dragons 5e"
+    },
+    "year": {
+      "value": 2022
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 1
+    },
+    "deaths": {
+      "value": 0
+    }
+  },
+  {
+    "campaign": {
+      "value": "Contes du portail béant"
+    },
+    "gm": {
+      "value": "Arthur"
+    },
+    "game": {
+      "value": "Donjons & Dragons 5e"
+    },
+    "year": {
+      "value": 2023
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 1
+    },
+    "deaths": {
+      "value": 0
+    }
+  },
+  {
+    "campaign": {
+      "value": "L'héritage Greenberg"
+    },
+    "gm": {
+      "value": "Léo"
+    },
+    "game": {
+      "value": "Chroniques oubliées"
+    },
+    "year": {
+      "value": 2024
+    },
+    "pj_max": {
+      "value": 6
+    },
+    "duration": {
+      "value": 1,
+      "notes": [
+        "Est toujours en cours hors du club."
+      ]
+    },
+    "deaths": {
+      "value": 0,
+      "notes": [
+        "Mais de nombreux traumas."
+      ]
+    }
+  },
+  {
+    "campaign": {
+      "value": "Shadowrun"
+    },
+    "gm": {
+      "value": "Léo"
+    },
+    "game": {
+      "value": "Chroniques oubliées"
+    },
+    "year": {
+      "value": 2025
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 0
+    },
+    "deaths": {
+      "value": 0
+    }
+  },
+  {
+    "campaign": {
+      "value": "Le Second Souffle"
+    },
+    "gm": {
+      "value": "Victor"
+    },
+    "game": {
+      "value": "Blades in the Dark"
+    },
+    "year": {
+      "value": 2026
+    },
+    "pj_max": {
+      "value": 4
+    },
+    "duration": {
+      "value": 0
+    },
+    "deaths": {
+      "value": 2
+    }
+  },
+  {
+    "campaign": {
+      "value": "L'ennemi intérieur"
+    },
+    "gm": {
+      "value": "Jules"
+    },
+    "game": {
+      "value": "Warhammer Fantasy"
+    },
+    "year": {
+      "value": 2026
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 0
+    },
+    "deaths": {
+      "value": 0
+    }
+  },
+  {
+    "campaign": {
+      "value": "Victor Shaan"
+    },
+    "gm": {
+      "value": "Victor"
+    },
+    "game": {
+      "value": "Shaan Renaissance"
+    },
+    "year": {
+      "value": 2022
+    },
+    "pj_max": {
+      "value": 6
+    },
+    "duration": {
+      "value": 2
+    },
+    "deaths": {
+      "value": 0
+    }
+  },
+  {
+    "campaign": {
+      "value": "Éons"
+    },
+    "gm": {
+      "value": "Damien S."
+    },
+    "game": {
+      "value": "Donjons & Dragons 5e"
+    },
+    "year": {
+      "value": 2026
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 0
     },
     "deaths": {
       "value": 0

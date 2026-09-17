@@ -244,3 +244,28 @@ button.guess-cell {
     --name-col: 100px;
   }
 }
+
+@keyframes idleFieldPulse {
+  0%,
+  100% {
+    border-color: var(--color-input-border);
+    box-shadow: 0 0 0 0 rgb(194 90 42 / 0.2);
+    transform: translateY(0);
+  }
+  50% {
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 4px rgb(194 90 42 / 0.12);
+    transform: translateY(-1px);
+  }
+}
+
+.input-idle-hint {
+  animation: idleFieldPulse 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input-idle-hint {
+    animation: none;
+    box-shadow: none;
+  }
+}

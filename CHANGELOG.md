@@ -4,6 +4,33 @@ Toutes les évolutions notables du projet. Format inspiré de
 [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), la version la plus
 récente en premier.
 
+## [0.4.0] — 2026-09-17
+
+### Ajouté
+
+- **Hint d'interaction sur le champ de recherche.** Quand aucune tentative n'a
+  encore été faite et que le champ est vide, il pulsera légèrement pour signaler
+  qu'il doit être cliqué avant de taper une campagne.
+- **Bouton de partage de résultat.** Une fois la partie terminée, le joueur peut
+  copier ou partager son score directement dans un message Discord ou sur son
+  système de partage natif, avec une grille d'émojis de résultat.
+
+### Modifié
+
+- **Le mode Illimité suit désormais la même limite de 6 essais** que le mode
+  hebdomadaire. La partie se termine au sixième essai, même sans échéance
+  hebdomadaire.
+- **Le format de partage est un mini-grid lisible en texte brut** : chaque case
+  est représentée par un seul emoji, avec les flèches de direction pour les
+  valeurs numériques incorrectes.
+
+### Corrigé
+
+- Les statistiques du mode Illimité continuent d'incrémenter correctement les
+  parties jouées et le taux de réussite, y compris en cas d'échec.
+- Le texte de partage est désormais plus utile en contexte Discord, avec la date
+  du dernier reset hebdomadaire et l'invitation à rejouer sur la page actuelle.
+
 ## [0.3.0] — 2026-09-16
 
 ### ⚠ Rupture de compatibilité

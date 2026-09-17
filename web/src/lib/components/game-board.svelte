@@ -215,6 +215,9 @@
       isWon={game.isWon}
       target={game.target}
       guessCount={game.guesses.length}
+      results={game.results}
+      mode={mode}
+      periodIndex={period?.index ?? 0}
       onNewGame={mode === "unlimited" ? handleNewGame : undefined}
       endsAt={mode === "unlimited" ? undefined : period.endsAt}
       streak={mode === "unlimited" || streak?.lastPeriod !== period.index

@@ -14,7 +14,7 @@ const UNLIMITED_SEED_KEY = `${STORAGE_KEY_PREFIX}unlimited_seed`;
  * @param {Object} config
  * @param {Object} config.target - Target campaign to guess
  * @param {Function} config.compareFn - (guess, target) => comparison results
- * @param {number} config.maxGuesses - Max allowed guesses (0 = unlimited)
+ * @param {number} config.maxGuesses - Max allowed guesses; the game stops once this count is reached.
  * @param {string} config.mode - "weekly" or "unlimited"
  * @param {string} config.seed - Seed string for mode
  */

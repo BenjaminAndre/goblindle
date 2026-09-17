@@ -4,11 +4,82 @@
   import { STREAK_RULE, streakMessage } from "$lib/streak";
 
   /** Win/loss message, with a countdown in weekly mode and a button in unlimited */
-  let { isWon, target, guessCount, onNewGame, endsAt, streak } = $props();
+  let { isWon, target, guessCount, results, mode, periodIndex, onNewGame, endsAt, streak } = $props();
 
   // undefined in unlimited mode, and when the stored streak belongs to an
   // earlier period than the one just played.
   let showStreak = $derived(Boolean(streak));
+  let copied = $state(false);
+
+  let shareText = $derived.by(() => {
+    const shareUrl =
+      typeof window !== "undefined" ? window.location.href : "https://goblindle.fr";
+
+    const weeklyDateLabel =
+      mode === "weekly" && endsAt
+        ? new Intl.DateTimeFormat("fr-FR", {
+            timeZone: "Europe/Brussels",
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          }).format(new Date(new Date(endsAt).getTime() - 7 * 24 * 60 * 60 * 1000))
+        : "Illimité";
+
+    const heading = `Goblindle ${mode === "weekly" ? `du ${weeklyDateLabel}` : weeklyDateLabel} — ${isWon ? "victoire" : "défaite"} en ${guessCount} essai${guessCount > 1 ? "s" : ""}`;
+    const rows = Array.isArray(results)
+      ? results.map((row) =>
+          row
+            .map((cell) => {
+              if (cell.result === "correct") return "🟩";
+              if (cell.direction === "up") return "⬆️";
+              if (cell.direction === "down") return "⬇️";
+              return "🟥";
+            })
+            .join("")
+        )
+      : [];
+    return [heading, ...rows, `Tente de me battre : ${shareUrl}`].join("\n");
+  });
+
+  async function shareResult() {
+    const text = shareText;
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({
+          title: "Goblindle",
+          text,
+        });
+        return;
+      }
+    } catch {
+      // Share can fail on some browsers; copy is the fallback.
+    }
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      copied = true;
+      window.setTimeout(() => {
+        copied = false;
+      }, 1800);
+    } catch {
+      // Best-effort fallback: no noisy error on unsupported browsers.
+      copied = true;
+      window.setTimeout(() => {
+        copied = false;
+      }, 1800);
+    }
+  }
 </script>
 
 <div class="text-center py-6 px-4 mx-auto max-w-[400px]">
@@ -37,6 +108,14 @@
       <CampaignAvatar campaign={target} size={80} />
     </div>
   {/if}
+
+  <button
+    type="button"
+    onclick={shareResult}
+    class="mt-4 w-full px-5 py-2.5 rounded-lg border border-[var(--color-input-border)] bg-[var(--color-surface)] text-[var(--color-text)] font-semibold cursor-pointer transition-colors hover:bg-[var(--color-surface-hover)]"
+  >
+    {copied ? "Résultat copié" : "Partager le résultat"}
+  </button>
 
   <!-- Both branches: a player who has just broken a long run needs this more. -->
   {#if showStreak}
