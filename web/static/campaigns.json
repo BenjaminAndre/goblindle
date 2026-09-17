@@ -35,8 +35,7 @@
     "campaign": {
       "value": "Dragon de la flèche de givre",
       "notes": [
-        "De rage, le barbare a mis un coup de boule dans un mur, et coup de bol, il y avait une porte cachée. Ils ont ouvert toutes les portes du donjon avec leur tête.",
-
+        "De rage, le barbare a mis un coup de boule dans un mur, et coup de bol, il y avait une porte cachée. Ils ont ouvert toutes les portes du donjon avec leur tête."
       ]
     },
     "gm": {
@@ -171,7 +170,7 @@
     "deaths": {
       "value": 0
     }
-  ,
+  },
   {
     "campaign": {
       "value": "Dorian Pathfinder"
@@ -197,5 +196,5 @@
     "deaths": {
       "value": 0
     }
-  
+  }  
 ]
