@@ -33,6 +33,121 @@
   },
   {
     "campaign": {
+      "value": "Dragon de la flèche de givre",
+      "notes": [
+        "De rage, le barbare a mis un coup de boule dans un mur, et coup de bol, il y avait une porte cachée. Ils ont ouvert toutes les portes du donjon avec leur tête.",
+
+      ]
+    },
+    "gm": {
+      "value": "Maxime"
+    },
+    "game": {
+      "value": "Donjons & Dragons 5e"
+    },
+    "year": {
+      "value": 2025,
+      "notes": [
+        "Techniquement, l'année 2024-2025, mais la campagne a commencé au Q2."
+      ]
+    },
+    "pj_max": {
+      "value": 4
+    },
+    "duration": {
+      "value": 0
+    },
+    "deaths": {
+      "value": 1, "notes": [
+        "Le druide a été tué par l'avarice du barde, retirant un épée sinistre d'un crâne de dragon, malgré l'état usé de l'équipe.",
+        "Il y a aussi eu un \"TPK\", sans mort mais capture, car ils ont eu la bonne idée d'abattre un mur pendant une mission d'infiltration.."
+      ]
+    }
+  },
+  {
+    "campaign": {
+      "value": "Maxime Fabula Ultima"
+    },
+    "gm": {
+      "value": "Maxime"
+    },
+    "game": {
+      "value": "Fabula Ultima"
+    },
+    "year": {
+      "value": 2025
+    },
+    "pj_max": {
+      "value": 5,
+      "notes": [
+        "8 joueurs différents au total, mais pas plus de 5 en même temps.",
+        "7 des 8 joueurs ont finis comme dieux immortel, et le dernier a préféré se faire moine."
+      ]
+    },
+    "duration": {
+      "value": 2
+    },
+    "deaths": {
+      "value": 0,
+      "notes": [
+        "On ne peut pas mourir dans Fabula Ultima, mais ils ont failli rester coincés dans un casino, version lotus de l'Odyssée."
+      ]
+    }
+  },
+  {
+    "campaign": {
+      "value": "Benjamin Wulin"
+    },
+    "gm": {
+      "value": "Benjamin"
+    },
+    "game": {
+      "value": "Coeur du Wulin"
+    },
+    "year": {
+      "value": 2026
+    },
+    "pj_max": {
+      "value": 4
+    },
+    "duration": {
+      "value": 0
+    },
+    "deaths": {
+      "value": 0
+    }
+  },
+  {
+    "campaign": {
+      "value": "Le Trône d'Épines"
+    },
+    "gm": {
+      "value": "Benjamin"
+    },
+    "game": {
+      "value": "Symbaroum"
+    },
+    "year": {
+      "value": 2023
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 1,
+      "notes": [
+        "Et seulement le livre 1 a été fait. Il reste de quoi faire du hors club pour des dizaines de sessions facilement."
+      ]
+    },
+    "deaths": {
+      "value": 0,
+      "notes": [
+        "Bien que le prêtre aie vraiment failli y passer en choisissant de purifier sa corruption par le feu. Sur tout son corps."
+      ]
+    }
+  },
+  {
+    "campaign": {
       "value": "Dorian Pathfinder"
     },
     "gm": {
@@ -56,5 +171,31 @@
     "deaths": {
       "value": 0
     }
-  }
+  ,
+  {
+    "campaign": {
+      "value": "Dorian Pathfinder"
+    },
+    "gm": {
+      "value": "Dorian"
+    },
+    "game": {
+      "value": "Pathfinder 2e"
+    },
+    "year": {
+      "value": 2025
+    },
+    "pj_max": {
+      "value": 5,
+      "notes": [
+        "Deux changements de joueurs en cours de route, mais le nombre maximum de joueurs est resté à 5."
+      ]
+    },
+    "duration": {
+      "value": 1
+    },
+    "deaths": {
+      "value": 0
+    }
+  
 ]
