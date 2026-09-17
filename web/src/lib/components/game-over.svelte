@@ -42,6 +42,20 @@
     return [heading, ...rows, `Tente de me battre : ${shareUrl}`].join("\n");
   });
 
+  let emojiRows = $derived.by(() => {
+    if (!Array.isArray(results)) return [];
+    return results.map((row) =>
+      row
+        .map((cell) => {
+          if (cell.result === "correct") return "🟩";
+          if (cell.direction === "up") return "⬆️";
+          if (cell.direction === "down") return "⬇️";
+          return "🟥";
+        })
+        .join(""),
+    );
+  });
+
   async function shareResult() {
     const text = shareText;
 
@@ -106,13 +120,22 @@
     </div>
   {/if}
 
-  <button
-    type="button"
-    onclick={shareResult}
-    class="mt-4 w-full px-5 py-2.5 rounded-lg border border-[var(--color-input-border)] bg-[var(--color-surface)] text-[var(--color-text)] font-semibold cursor-pointer transition-colors hover:bg-[var(--color-surface-hover)]"
-  >
-    {copied ? "Résultat copié" : "Partager le résultat"}
-  </button>
+  <div class="mt-4 rounded-lg border border-[var(--color-input-border)] bg-[var(--color-surface)] p-3 text-left">
+    <div class="font-mono text-sm leading-relaxed tracking-[0.12em] break-words text-[var(--color-text)]">
+      {#each emojiRows as row (row)}
+        <div>{row}</div>
+      {/each}
+    </div>
+
+    <button
+      type="button"
+      onclick={shareResult}
+      class="mt-3 inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--color-input-border)] bg-[var(--color-bg)] px-3 py-2 text-sm font-semibold text-[var(--color-text)] cursor-pointer transition-colors hover:bg-[var(--color-surface-hover)]"
+    >
+      <span aria-hidden="true">{copied ? "✅" : "📋"}</span>
+      <span>{copied ? "Copié" : "Copier"}</span>
+    </button>
+  </div>
 
   {#if showStreak}
     <div
@@ -137,7 +160,6 @@
       Nouvelle partie
     </button>
   {:else if endsAt}
-    <!-- Weekly mode has no replay, so this panel is on screen for up to a week. -->
     <Countdown {endsAt} />
   {/if}
 </div>

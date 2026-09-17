@@ -139,19 +139,24 @@ function slugify(name) {
 
 /** Filter campaigns for autocomplete (prefix-first, then substring) */
 export function searchCampaigns(query, excludeNames = []) {
-  if (!query) return [];
-  const lower = query.toLowerCase();
-  const excluded = new Set(excludeNames.map((n) => n.toLowerCase()));
+  const text = String(query ?? "").trim();
+  if (!text) return [];
+
+  const search = foldForSearch(text);
+  const excluded = new Set(
+    excludeNames.map((name) => foldForSearch(name)),
+  );
 
   return campaigns
-    .filter(
-      (c) =>
-        c.name.toLowerCase().includes(lower) &&
-        !excluded.has(c.name.toLowerCase()),
-    )
+    .filter((c) => {
+      const name = foldForSearch(c.name);
+      return name.includes(search) && !excluded.has(name);
+    })
     .sort((a, b) => {
-      const aStarts = a.name.toLowerCase().startsWith(lower) ? 0 : 1;
-      const bStarts = b.name.toLowerCase().startsWith(lower) ? 0 : 1;
+      const aName = foldForSearch(a.name);
+      const bName = foldForSearch(b.name);
+      const aStarts = aName.startsWith(search) ? 0 : 1;
+      const bStarts = bName.startsWith(search) ? 0 : 1;
       return aStarts - bStarts || a.name.localeCompare(b.name);
     })
     .slice(0, 8);
