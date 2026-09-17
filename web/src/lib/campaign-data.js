@@ -137,6 +137,14 @@ function slugify(name) {
     .replace(/^-+|-+$/g, "");
 }
 
+/** Accent-folding helper for case-insensitive autocomplete search. */
+function foldForSearch(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+}
+
 /** Filter campaigns for autocomplete (prefix-first, then substring) */
 export function searchCampaigns(query, excludeNames = []) {
   const text = String(query ?? "").trim();
