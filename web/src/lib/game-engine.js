@@ -1,5 +1,7 @@
 // Mode-agnostic game state machine with localStorage persistence
 
+import { getCampaignByName } from "./campaign-data.js";
+
 const STORAGE_KEY_PREFIX = "goblindle_v3_";
 /**
  * Prefixes from earlier versions, swept on load so their state can never be
@@ -24,17 +26,19 @@ export function createGame(config) {
   // Try to restore saved state
   const saved = loadState(mode, seed);
   if (saved && saved.targetName === target.name && isValidSavedGame(saved)) {
+    // Reconstruct full campaign objects from names
+    const guesses = saved.guesses.map((g) => getCampaignByName(g.name) || g);
     return {
       target,
       compareFn,
       maxGuesses,
       mode,
       seed,
-      guesses: saved.guesses,
+      guesses,
       // Recomputed rather than restored: a saved results array was built against
       // whatever CLASSIC_ATTRIBUTES looked like when it was written, and against
       // the campaign values as they read at that moment.
-      results: saved.guesses.map((g) => compareFn(g, target)),
+      results: guesses.map((g) => compareFn(g, target)),
       isOver: saved.isOver,
       isWon: saved.isWon,
     };

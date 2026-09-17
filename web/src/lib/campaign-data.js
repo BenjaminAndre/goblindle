@@ -206,6 +206,11 @@ export function getCampaignForSeed(seed) {
   return campaigns[fmix32(hashString(String(seed))) % campaigns.length];
 }
 
+/** Look up a campaign by name (case-sensitive). */
+export function getCampaignByName(name) {
+  return campaigns.find((c) => c.name === name) || null;
+}
+
 /**
  * The order campaigns are drawn in during one cycle.
  *
