@@ -42,20 +42,6 @@
     return [heading, ...rows, `Tente de me battre : ${shareUrl}`].join("\n");
   });
 
-  let emojiRows = $derived.by(() => {
-    if (!Array.isArray(results)) return [];
-    return results.map((row) =>
-      row
-        .map((cell) => {
-          if (cell.result === "correct") return "🟩";
-          if (cell.direction === "up") return "⬆️";
-          if (cell.direction === "down") return "⬇️";
-          return "🟥";
-        })
-        .join(""),
-    );
-  });
-
   async function shareResult() {
     const text = shareText;
 
