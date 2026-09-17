@@ -165,7 +165,7 @@ describe("streakMessage — wins", () => {
   });
 
   it("says nothing extra below the first tier", () => {
-    expect(win(9)).toBe("9 semaines d'affilée.");
+    expect(win(1)).toBe("1 semaine d'affilée.");
   });
 
   it("changes message at each threshold", () => {

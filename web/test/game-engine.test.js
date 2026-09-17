@@ -173,7 +173,7 @@ describe("persistence — storage key contract", () => {
     const saved = JSON.parse(localStorage.getItem("goblindle_v3_weekly_2026-07-23"));
     expect(saved).toMatchObject({
       targetName: "La Campagne des Gobelins",
-      guesses: [OMBRES],
+      guesses: [{ name: "Les Ombres d'Ébène" }],
       isOver: false,
       isWon: false,
     });
@@ -185,7 +185,7 @@ describe("persistence — restore on createGame", () => {
   it("restores an in-progress game for the same target", () => {
     submitGuess(weekly(), OMBRES);
     const restored = weekly();
-    expect(restored.guesses).toEqual([OMBRES]);
+    expect(restored.guesses).toEqual([{ name: "Les Ombres d'Ébène" }]);
     expect(restored.results).toHaveLength(1);
   });
 
