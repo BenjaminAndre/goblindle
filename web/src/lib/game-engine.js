@@ -23,7 +23,7 @@ export function createGame(config) {
 
   // Try to restore saved state
   const saved = loadState(mode, seed);
-  if (saved && saved.targetName === target.name) {
+  if (saved && saved.targetName === target.name && isValidSavedGame(saved)) {
     return {
       target,
       compareFn,
@@ -81,10 +81,15 @@ export function submitGuess(game, campaign) {
 export function getOrCreateUnlimitedSeed() {
   try {
     const saved = localStorage.getItem(UNLIMITED_SEED_KEY);
-    if (saved) return saved;
+    // Validate the saved seed is a non-empty string and looks like a seed
+    // (starts with "unlimited_" or is a reasonable seed format)
+    if (saved && typeof saved === "string" && saved.length > 0) {
+      return saved;
+    }
   } catch {
-    // Ignore
+    // Ignore localStorage access errors
   }
+  // If the saved seed is missing, invalid, or corrupted, generate a new one
   return createNewUnlimitedSeed();
 }
 
@@ -92,9 +97,11 @@ export function getOrCreateUnlimitedSeed() {
 function createNewUnlimitedSeed() {
   const seed = `unlimited_${Date.now()}_${Math.random()}`;
   try {
+    // Clear any corrupted seed first
+    localStorage.removeItem(UNLIMITED_SEED_KEY);
     localStorage.setItem(UNLIMITED_SEED_KEY, seed);
   } catch {
-    // Ignore
+    // Ignore storage quota or access errors
   }
   return seed;
 }
@@ -153,7 +160,7 @@ function saveState(game) {
   const key = getStorageKey(game.mode, game.seed);
   const data = {
     targetName: game.target.name,
-    guesses: game.guesses,
+    guesses: game.guesses.map((g) => ({ name: g.name })),
     results: game.results,
     isOver: game.isOver,
     isWon: game.isWon,
@@ -171,10 +178,23 @@ function loadState(mode, seed) {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return isValidSavedGame(parsed) ? parsed : null;
   } catch {
     return null;
   }
+}
+
+function isValidSavedGame(saved) {
+  return (
+    saved &&
+    typeof saved === "object" &&
+    typeof saved.targetName === "string" &&
+    Array.isArray(saved.guesses) &&
+    Array.isArray(saved.results) &&
+    typeof saved.isOver === "boolean" &&
+    typeof saved.isWon === "boolean"
+  );
 }
 
 /**

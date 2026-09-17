@@ -107,7 +107,7 @@
   {#if isWon}
     <!-- French pluralises from 2, so "0 essai" and "1 essai" both stay singular. -->
     <p class="text-[var(--color-text-muted)] mb-3">
-      Vous avez trouvé <strong class="text-[var(--color-text)]">{target.name}</strong>
+      Tu as trouvé <strong class="text-[var(--color-text)]">{target.name}</strong>
       en <strong class="text-[var(--color-text)]">{guessCount}</strong>
       essai{guessCount > 1 ? "s" : ""} !
     </p>
@@ -121,10 +121,8 @@
   {/if}
 
   <div class="mt-4 rounded-lg border border-[var(--color-input-border)] bg-[var(--color-surface)] p-3 text-left">
-    <div class="font-mono text-sm leading-relaxed tracking-[0.12em] break-words text-[var(--color-text)]">
-      {#each emojiRows as row (row)}
-        <div>{row}</div>
-      {/each}
+    <div class="font-mono text-sm leading-relaxed tracking-[0.12em] break-words text-[var(--color-text)] whitespace-pre-wrap">
+      {shareText}
     </div>
 
     <button

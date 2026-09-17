@@ -12,12 +12,20 @@ const STORAGE_KEY = "goblindle_v3_streak";
  * the thresholds are then assertable as data.
  */
 const TIERS = [
-  { min: 200, text: "Quatre ans. Il faut nous dire comment vous faites." },
+  { min: 200, text: "Quatre ans. Il faut nous dire comment tu fais." },
   { min: 100, text: "Deux ans. Personne ne vérifie, mais quand même." },
   { min: 50, text: "Presque un an." },
   { min: 20, text: "Plus d'une rotation complète sans faute." },
   { min: 15, text: "Bientôt une rotation complète." },
   { min: 10, text: "Ça commence à se voir." },
+  { min: 9, text: "Neuf d'affilée. Un rythme de champion." },
+  { min: 8, text: "Huit semaines sans rater. Du sérieux." },
+  { min: 7, text: "Une semaine complète de victoires." },
+  { min: 6, text: "Six de suite, c'est du niveau expert." },
+  { min: 5, text: "Cinq victoires d'affilée, ça s'appelle une série." },
+  { min: 4, text: "Quatre fois de suite, c'est pas un hasard." },
+  { min: 3, text: "Trois victoires d'affilée, ça commence bien." },
+  { min: 2, text: "Deux semaines sans rater. Continue !" },
   { min: 1, text: null },
 ];
 
