@@ -1,0 +1,168 @@
+<h1>Changelog</h1>
+<p>Toutes les évolutions notables du projet. Format inspiré de
+<a href="https://keepachangelog.com/fr/1.1.0/">Keep a Changelog</a>, la version la plus
+récente en premier.</p>
+<h2>[0.4.0] — 2026-09-17</h2>
+<h3>Ajouté</h3>
+<ul>
+<li><strong>Hint d&#39;interaction sur le champ de recherche.</strong> Quand aucune tentative n&#39;a
+encore été faite et que le champ est vide, il pulsera légèrement pour signaler
+qu&#39;il doit être cliqué avant de taper une campagne.</li>
+<li><strong>Bouton de partage de résultat.</strong> Une fois la partie terminée, le joueur peut
+copier ou partager son score directement dans un message Discord ou sur son
+système de partage natif, avec une grille d&#39;émojis de résultat.</li>
+</ul>
+<h3>Modifié</h3>
+<ul>
+<li><strong>Le mode Illimité suit désormais la même limite de 6 essais</strong> que le mode
+hebdomadaire. La partie se termine au sixième essai, même sans échéance
+hebdomadaire.</li>
+<li><strong>Le format de partage est un mini-grid lisible en texte brut</strong> : chaque case
+est représentée par un seul emoji, avec les flèches de direction pour les
+valeurs numériques incorrectes.</li>
+</ul>
+<h3>Corrigé</h3>
+<ul>
+<li>Les statistiques du mode Illimité continuent d&#39;incrémenter correctement les
+parties jouées et le taux de réussite, y compris en cas d&#39;échec.</li>
+<li>Le texte de partage est désormais plus utile en contexte Discord, avec la date
+du dernier reset hebdomadaire et l&#39;invitation à rejouer sur la page actuelle.</li>
+</ul>
+<h2>[0.3.0] — 2026-09-16</h2>
+<h3>⚠ Rupture de compatibilité</h3>
+<p>Le préfixe de stockage passe à <code>goblindle_v3_</code>. Au premier chargement après la
+mise à jour, <strong>toute partie en cours et toutes les statistiques du mode Illimité
+sont effacées</strong>. C&#39;est volontaire : cela permet une disposition des clés simple
+plutôt que défensive.</p>
+<h3>Ajouté</h3>
+<ul>
+<li><strong>Série hebdomadaire.</strong> L&#39;écran de fin affiche le nombre de semaines gagnées
+d&#39;affilée, avec un message qui évolue à 10, 15, 20, 50, 100 et 200 semaines.
+Deux règles, rappelées sous le message parce qu&#39;elles ne se devinent pas :
+<strong>passer une semaine ne casse rien</strong> — la série gèle — mais <strong>abandonner une
+partie commencée la casse</strong>, pour que personne ne protège sa série en
+s&#39;arrêtant au cinquième essai. Une semaine abandonnée est détectée au
+chargement suivant, avant le nettoyage des parties passées.</li>
+<li><strong>Le logo du club</strong> en icône d&#39;onglet et à côté du titre. Icône iOS séparée,
+aplatie sur fond clair : iOS compose la transparence sur du noir, et le logo
+est presque entièrement sombre.</li>
+<li><code>color-scheme: dark</code>, qui manquait : les ascenseurs, les anneaux de focus par
+défaut, le remplissage automatique de Chrome et <code>::selection</code> étaient rendus
+en clair sur une page sombre.</li>
+</ul>
+<h3>Modifié</h3>
+<ul>
+<li><strong>Palette alignée sur le logo</strong> — bruns maroon très sombres et blanc cassé
+chaud, échantillonnés dans l&#39;image. Polices, arrondis et tailles inchangés.
+Le vert et le rouge des cellules ne bougent pas : c&#39;est le langage du jeu.</li>
+<li>Le décompte s&#39;affiche en <code>dd-hh:mm:ss</code>, largeur fixe.</li>
+<li>Les boutons passent au blanc cassé du logo plutôt qu&#39;à un orange de marque :
+toute teinte chaude se confondrait avec le rouge des cellules, et la vignette
+d&#39;initiales s&#39;affiche à quatre pixels d&#39;une cellule dans la grille.</li>
+<li>La bordure du champ de recherche et l&#39;accent ne partagent plus la même valeur.
+C&#39;est ce qui rendait l&#39;indicateur de focus invisible : il était exactement de
+la couleur de la bordure au repos.</li>
+</ul>
+<h3>Corrigé</h3>
+<ul>
+<li><strong>Texte blanc sur les cellules rouges : 3,77:1, sous le seuil WCAG AA</strong> depuis
+toujours, et pire encore en 0,7 rem sur mobile. Les trois cellules ont
+désormais un texte sombre, à 5,14:1 sur le rouge.</li>
+<li>Le « ? » des anecdotes était affiché à 55 % d&#39;opacité et devenait illisible sur
+les cellules — 2,13:1 sur le rouge — alors que c&#39;est le seul indice qu&#39;une
+case est cliquable.</li>
+<li>L&#39;ombre portée de la bulle d&#39;anecdote était du noir à 45 % sur une page
+quasi noire, donc invisible. Remplacée par un liseré clair.</li>
+<li>Suppression de <code>--color-partial</code> et de <code>.cell-partial</code> : <code>compareCampaigns</code> ne
+renvoie plus que <code>correct</code> ou <code>wrong</code> depuis la v0.1, la règle ne s&#39;appliquait
+jamais.</li>
+</ul>
+<h3>Limites connues</h3>
+<ul>
+<li>La série est stockée dans le <code>localStorage</code> du navigateur : elle ne survit pas
+à un vidage du cache, ne suit pas d&#39;un appareil à l&#39;autre, et n&#39;existe pas en
+navigation privée.</li>
+</ul>
+<h2>[0.2.0] — 2026-09-16</h2>
+<h3>Ajouté</h3>
+<ul>
+<li><strong>Bulles d&#39;anecdotes.</strong> Chaque case de la grille dont la campagne a une note
+pour ce champ devient cliquable et affiche une anecdote tirée au hasard. Au
+survol sur ordinateur, au toucher sur mobile, où la case entière fait office
+de cible. Fermeture à l&#39;Échap, au clic à côté, ou en refermant la case.</li>
+<li><strong>Bannière de contribution.</strong> Invite les joueurs à signaler une campagne
+manquante, une anecdote à ajouter ou une information erronée, via
+<code>mailto:</code>. L&#39;adresse est assemblée en JavaScript au premier survol, donc
+absente du HTML servi — voir les limites ci-dessous. Si aucun client mail
+n&#39;est configuré, l&#39;adresse s&#39;affiche en clair avec un bouton « copier ».</li>
+<li><strong>Décompte hebdomadaire.</strong> Une fois la partie terminée, l&#39;écran de fin
+indique le temps restant avant la prochaine campagne.</li>
+</ul>
+<h3>Modifié</h3>
+<ul>
+<li><strong>Le mode « Quotidien » devient « Hebdomadaire ».</strong> Le jeu se réinitialise
+désormais chaque <strong>jeudi à 19 h, heure de Bruxelles</strong> — juste avant les
+séances. Le fuseau est fixe et non celui du joueur : tout le monde a la même
+campagne au même instant, y compris en déplacement. Les semaines de changement
+d&#39;heure durent 167 ou 169 heures réelles et le décompte en tient compte.</li>
+<li>La sélection de la campagne se fait maintenant sur l&#39;indice de la période et
+non sur la date. Chaque campagne sort exactement une fois par rotation de 16
+semaines, sans jamais se répéter deux semaines de suite.</li>
+<li>Les parties en cours sont stockées sous <code>goblindle_v1_weekly_&lt;jeudi&gt;</code> ; les
+anciennes clés <code>goblindle_v1_daily_*</code> sont supprimées au chargement. Les
+statistiques du mode Illimité sont conservées.</li>
+<li>Le mode inconnu ne partage plus sa sauvegarde avec le mode Illimité.</li>
+<li>Une seule GitHub Action : <code>ci.yml</code> est supprimé et ses étapes <code>npm test</code> et
+<code>npm run lint</code> passent dans <code>deploy.yml</code>, avant le build. Un test qui échoue
+bloque donc le déploiement.</li>
+</ul>
+<h3>Corrigé</h3>
+<ul>
+<li>Prise en charge de <code>prefers-reduced-motion</code> sur la grille. L&#39;ajout naïf
+(<code>animation: none</code>) aurait vidé le plateau, les cases partant d&#39;une opacité
+nulle et ne devant leur apparition qu&#39;à l&#39;animation.</li>
+<li>Le passage d&#39;une période à la suivante, onglet ouvert, ne réinitialise plus
+silencieusement une partie en cours : le décompte propose un rechargement.</li>
+</ul>
+<h3>Limites connues</h3>
+<ul>
+<li>L&#39;obfuscation de l&#39;adresse protège la page déployée, qui est le principal
+vecteur de collecte. Le dépôt étant public, l&#39;adresse reste lisible dans le
+code source sur GitHub — d&#39;où le choix d&#39;une adresse dédiée, jetable si elle
+finit par attirer du spam.</li>
+<li>Avec 16 campagnes et un tirage par semaine, la rotation épuise le jeu de
+données en 16 semaines. Ajouter des campagnes rallonge le cycle et donne plus
+de matière aux bulles d&#39;anecdotes.</li>
+</ul>
+<h2>[0.1.0] — 2026-09-16</h2>
+<p>Première version : conversion d&#39;un clone de LoLdle en jeu de devinettes sur les
+campagnes de la guilde.</p>
+<h3>Ajouté</h3>
+<ul>
+<li>Format de données par campagne : <code>campaign</code>, <code>gm</code>, <code>game</code>, <code>year</code>, <code>pj_max</code>,
+<code>duration</code> (en années pleines) et <code>deaths</code>, chaque champ portant une valeur et
+une liste facultative d&#39;anecdotes.</li>
+<li>Interface entièrement en français.</li>
+<li>Emplacement d&#39;illustration facultatif par campagne, avec une vignette
+d&#39;initiales par défaut.</li>
+<li>Contrôles au chargement : le jeu refuse de démarrer sur un fichier vide, une
+campagne sans nom, ou deux noms qui ne se distinguent que par les accents ou
+la ponctuation — ce dernier cas cassant la grille en pleine partie.</li>
+</ul>
+<h3>Modifié</h3>
+<ul>
+<li><code>web/static/campaigns.json</code> devient l&#39;unique source de données, éditée à la
+main. Le dossier <code>data/</code> et son scraper Go, hérités du projet d&#39;origine, sont
+supprimés, ainsi que le workflow hebdomadaire qui écrasait les données.</li>
+<li>Le nombre de colonnes de la grille suit la liste des attributs au lieu d&#39;être
+répété dans trois blocs CSS.</li>
+</ul>
+<h3>Corrigé</h3>
+<ul>
+<li><strong>Une campagne sans mort était indevinable.</strong> <code>0</code> était traité comme une
+valeur absente : la case affichait « — » et la flèche haut/bas disparaissait.
+Dans la foulée, une valeur manquante ne produit plus de flèche mensongère.</li>
+<li><strong>La campagne du jour descendait le fichier dans l&#39;ordre.</strong> La fonction de
+hachage plaçait deux dates consécutives à des indices voisins ; 64 % des jours
+tombaient à ±1 de la veille. Remplacée par un cycle mélangé.</li>
+</ul>

@@ -1,17 +1,21 @@
 <script>
+  import { onMount } from "svelte";
   import { SvelteDate, SvelteSet } from "svelte/reactivity";
   import { getCurrentPeriod } from "$lib/schedule";
-  import { CHANGELOG_HTML } from "$lib/generated/changelog";
   import { summarizeWeeklyPerformance } from "$lib/weekly-stats";
 
   let isOpen = $state(false);
   let activePanel = $state("activity");
-  let changelogHtml = $state(CHANGELOG_HTML);
+  let changelogHtml = $state("");
   let headbarEl = $state();
   let panelEl = $state();
 
   let currentWeekSeed = $derived(getCurrentPeriod().seed);
-  let performance = $derived(summarizeWeeklyPerformance(undefined, currentWeekSeed));
+  let refreshToken = $state(0);
+  let performance = $derived.by(() => {
+    refreshToken;
+    return summarizeWeeklyPerformance(undefined, currentWeekSeed);
+  });
   let playedWeeklyGames = $derived(performance.playedWeeklyGames);
   let totals = $derived(performance.totals);
   let maxAttempts = $derived(performance.max);
@@ -131,7 +135,38 @@
       });
   }
 
-  let activitySeasons = $derived(buildActivitySeasons());
+  let activitySeasons = $derived.by(() => {
+    refreshToken;
+    return buildActivitySeasons();
+  });
+
+  onMount(() => {
+    let disposed = false;
+
+    fetch("/changelog.html")
+      .then((response) => {
+        if (!response.ok) throw new Error(`Changelog request failed: ${response.status}`);
+        return response.text();
+      })
+      .then((html) => {
+        if (!disposed) changelogHtml = html;
+      })
+      .catch(() => {
+        if (!disposed) changelogHtml = "<p>Le journal des versions est indisponible.</p>";
+      });
+
+    const refresh = () => {
+      refreshToken += 1;
+    };
+    window.addEventListener("storage", refresh);
+    window.addEventListener("goblindle:state-changed", refresh);
+
+    return () => {
+      disposed = true;
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("goblindle:state-changed", refresh);
+    };
+  });
 
   $effect(() => {
     function handlePointerDown(event) {

@@ -173,6 +173,9 @@ function saveState(game) {
   };
   try {
     localStorage.setItem(key, JSON.stringify(data));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("goblindle:state-changed"));
+    }
   } catch {
     // Ignore
   }
