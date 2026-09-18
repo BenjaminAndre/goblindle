@@ -21,17 +21,11 @@ const INITIAL_STOP_WORDS = new Set([
  * `{ value, notes? }` object per field; `normalise` flattens that into the
  * shape the rest of the app reads.
  */
-export async function loadCampaigns({ onProgress } = {}) {
-  const report = (percent, phase) => onProgress?.({ percent, phase });
-
-  if (campaigns.length > 0) {
-    report(100, "ready");
-    return campaigns;
-  }
+export async function loadCampaigns() {
+  if (campaigns.length > 0) return campaigns;
   if (loadPromise) return loadPromise;
 
   loadPromise = (async () => {
-    report(0, "download");
     const response = await fetch(asset("/campaigns.json"));
     if (!response.ok) {
       loadPromise = null;
@@ -39,34 +33,11 @@ export async function loadCampaigns({ onProgress } = {}) {
     }
 
     try {
-      let raw;
-      if (response.body?.getReader) {
-        const reader = response.body.getReader();
-        const chunks = [];
-        const decoder = new TextDecoder();
-        const total = Number(response.headers?.get("content-length")) || 0;
-        let loaded = 0;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          loaded += value.length;
-          report(total ? Math.min(80, (loaded / total) * 80) : null, "download");
-        }
-
-        raw = JSON.parse(chunks.map((chunk) => decoder.decode(chunk, { stream: true })).join("") + decoder.decode());
-      } else {
-        raw = await response.json();
-        report(80, "download");
-      }
-
-      report(85, "validation");
+      const raw = await response.json();
       // Checked before .map so a hand-edit that yields an object reports the
       // real problem rather than "raw.map is not a function".
       if (!Array.isArray(raw)) throw new Error("campaigns.json must be an array");
       campaigns = validate(raw.map((entry) => normalise(entry)));
-      report(100, "ready");
     } catch (err) {
       loadPromise = null;
       throw err;

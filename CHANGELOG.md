@@ -1,3 +1,20 @@
+## [0.5.2] — 2026-09-18
+
+### Modifié
+
+- Le graphe d'activité affiche les semaines futures lorsqu'elles sont présentes
+  dans l'historique local, afin de faciliter la vérification des saisons à venir.
+  Sans données futures, il conserve des cases vides uniquement jusqu'à la date
+  courante.
+- Le chargement des campagnes revient à un simple message texte : la barre de
+  progression estimée n'apportait pas d'information fiable pour ce fichier court.
+
+### Corrigé
+
+- Les confettis de victoire se déclenchent uniquement après une victoire obtenue
+  pendant la partie en cours ; ils ne réapparaissent plus lors d'un
+  rechargement d'une victoire déjà enregistrée.
+
 ## [0.5.1] — 2026-09-18
 
 ### Ajouté
@@ -5,9 +22,8 @@
 - **Outils console pour les données hebdomadaires.** `goblindleWeekly` permet
   d'inspecter, réinitialiser et régler les compteurs, d'enregistrer un résultat
   par seed et de générer un historique crédible de 2026 au début de 2029.
-- **Barre de progression du chargement.** Le chargement des campagnes indique
-  séparément le téléchargement et la préparation des données, avec un suivi des
-  octets lorsque le navigateur expose la taille du flux.
+- **Chargement simplifié des campagnes.** L’interface affiche un message clair
+  pendant le chargement, sans progression artificielle pour un fichier court.
 - **Métadonnées de partage.** Le titre, la description et le logo sont exposés
   via Open Graph et Twitter Cards pour les liens partagés.
 - **Célébration de victoire.** Une pluie de confettis légère se déclenche après
@@ -67,13 +83,26 @@
 
 ## [0.4.0] — 2026-09-17
 
-### Ajouté
-
 - **Hint d'interaction sur le champ de recherche.** Quand aucune tentative n'a
-  encore été faite et que le champ est vide, il pulsera légèrement pour signaler
   qu'il doit être cliqué avant de taper une campagne.
-- **Bouton de partage de résultat.** Une fois la partie terminée, le joueur peut
   copier ou partager son score directement dans un message Discord ou sur son
+
+## [0.5.2] — 2026-09-18
+
+### Modifié
+
+- Le graphe d'activité affiche les semaines futures lorsqu'elles sont présentes
+  dans l'historique local, afin de faciliter la vérification des saisons à venir.
+  Sans données futures, il conserve des cases vides uniquement jusqu'à la date
+  courante.
+- Le chargement des campagnes revient à un simple message texte : la barre de
+  progression estimée n'apportait pas d'information fiable pour ce fichier court.
+
+### Corrigé
+
+- Les confettis de victoire se déclenchent uniquement après une victoire obtenue
+  pendant la partie en cours ; ils ne réapparaissent plus lors d'un
+  rechargement d'une victoire déjà enregistrée.
   système de partage natif, avec une grille d'émojis de résultat.
 
 ### Modifié

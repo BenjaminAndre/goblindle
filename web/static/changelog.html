@@ -1,12 +1,27 @@
+<h2>[0.5.2] — 2026-09-18</h2>
+<h3>Modifié</h3>
+<ul>
+<li>Le graphe d&#39;activité affiche les semaines futures lorsqu&#39;elles sont présentes
+dans l&#39;historique local, afin de faciliter la vérification des saisons à venir.
+Sans données futures, il conserve des cases vides uniquement jusqu&#39;à la date
+courante.</li>
+<li>Le chargement des campagnes revient à un simple message texte : la barre de
+progression estimée n&#39;apportait pas d&#39;information fiable pour ce fichier court.</li>
+</ul>
+<h3>Corrigé</h3>
+<ul>
+<li>Les confettis de victoire se déclenchent uniquement après une victoire obtenue
+pendant la partie en cours ; ils ne réapparaissent plus lors d&#39;un
+rechargement d&#39;une victoire déjà enregistrée.</li>
+</ul>
 <h2>[0.5.1] — 2026-09-18</h2>
 <h3>Ajouté</h3>
 <ul>
 <li><strong>Outils console pour les données hebdomadaires.</strong> <code>goblindleWeekly</code> permet
 d&#39;inspecter, réinitialiser et régler les compteurs, d&#39;enregistrer un résultat
 par seed et de générer un historique crédible de 2026 au début de 2029.</li>
-<li><strong>Barre de progression du chargement.</strong> Le chargement des campagnes indique
-séparément le téléchargement et la préparation des données, avec un suivi des
-octets lorsque le navigateur expose la taille du flux.</li>
+<li><strong>Chargement simplifié des campagnes.</strong> L’interface affiche un message clair
+pendant le chargement, sans progression artificielle pour un fichier court.</li>
 <li><strong>Métadonnées de partage.</strong> Le titre, la description et le logo sont exposés
 via Open Graph et Twitter Cards pour les liens partagés.</li>
 <li><strong>Célébration de victoire.</strong> Une pluie de confettis légère se déclenche après
@@ -64,13 +79,26 @@ correctement.</li>
 sous un sous-chemin, notamment sur GitHub Pages.</li>
 </ul>
 <h2>[0.4.0] — 2026-09-17</h2>
-<h3>Ajouté</h3>
 <ul>
 <li><strong>Hint d&#39;interaction sur le champ de recherche.</strong> Quand aucune tentative n&#39;a
-encore été faite et que le champ est vide, il pulsera légèrement pour signaler
-qu&#39;il doit être cliqué avant de taper une campagne.</li>
-<li><strong>Bouton de partage de résultat.</strong> Une fois la partie terminée, le joueur peut
-copier ou partager son score directement dans un message Discord ou sur son
+qu&#39;il doit être cliqué avant de taper une campagne.
+copier ou partager son score directement dans un message Discord ou sur son</li>
+</ul>
+<h2>[0.5.2] — 2026-09-18</h2>
+<h3>Modifié</h3>
+<ul>
+<li>Le graphe d&#39;activité affiche les semaines futures lorsqu&#39;elles sont présentes
+dans l&#39;historique local, afin de faciliter la vérification des saisons à venir.
+Sans données futures, il conserve des cases vides uniquement jusqu&#39;à la date
+courante.</li>
+<li>Le chargement des campagnes revient à un simple message texte : la barre de
+progression estimée n&#39;apportait pas d&#39;information fiable pour ce fichier court.</li>
+</ul>
+<h3>Corrigé</h3>
+<ul>
+<li>Les confettis de victoire se déclenchent uniquement après une victoire obtenue
+pendant la partie en cours ; ils ne réapparaissent plus lors d&#39;un
+rechargement d&#39;une victoire déjà enregistrée.
 système de partage natif, avec une grille d&#39;émojis de résultat.</li>
 </ul>
 <h3>Modifié</h3>

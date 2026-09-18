@@ -39,11 +39,10 @@
   let game = $state(null);
   let loading = $state(true);
   let error = $state(null);
-  let loadingPercent = $state(0);
-  let loadingPhase = $state("download");
   let stats = $state(null);
   let period = $state(null);
   let streak = $state(null);
+  let celebrateWin = $state(false);
 
   let excludeNames = $derived(game ? game.guesses.map((g) => g.name) : []);
   let bubble = $state(null);
@@ -84,6 +83,7 @@
   }
 
   function initGame(gameMode) {
+    celebrateWin = false;
     const seed =
       gameMode === "unlimited" ? getOrCreateUnlimitedSeed() : period.seed;
     const target =
@@ -111,12 +111,7 @@
 
   onMount(async () => {
     try {
-      await loadCampaigns({
-        onProgress: ({ percent, phase }) => {
-          loadingPercent = percent ?? Math.min(95, loadingPercent + 2);
-          loadingPhase = phase;
-        },
-      });
+      await loadCampaigns();
       period = getCurrentPeriod();
 
       const stored = loadStreak();
@@ -145,6 +140,7 @@
     if (!updated) return;
 
     game = updated;
+    celebrateWin = updated.isOver && updated.isWon;
 
     if (updated.isOver && updated.mode === "unlimited") {
       saveUnlimitedStats(updated);
@@ -168,25 +164,9 @@
 </script>
 
 {#if loading}
-  <div class="w-full max-w-[400px] px-4 py-8 mx-auto text-center" aria-live="polite">
-    <p class="mb-3 text-[var(--color-text-muted)]">
-      {loadingPhase === "validation" ? "Préparation des campagnes..." : "Chargement des campagnes..."}
-    </p>
-    <div
-      class="h-2 overflow-hidden rounded-full bg-[var(--color-surface)]"
-      role="progressbar"
-      aria-label="Progression du chargement des campagnes"
-      aria-valuemin="0"
-      aria-valuemax="100"
-      aria-valuenow={loadingPercent}
-    >
-      <div
-        class="h-full rounded-full bg-[var(--color-accent)] transition-[width] duration-150"
-        style={`width: ${loadingPercent}%`}
-      ></div>
-    </div>
-    <p class="mt-2 text-xs text-[var(--color-text-muted)]">{Math.round(loadingPercent)} %</p>
-  </div>
+  <p class="text-center text-[var(--color-text-muted)] py-8" aria-live="polite">
+    Chargement des campagnes...
+  </p>
 {:else if error}
   <p class="text-center text-[var(--color-wrong)] py-8">
     Impossible de charger les campagnes. Rechargez la page.
@@ -244,6 +224,7 @@
       streak={mode === "unlimited" || streak?.lastPeriod !== period.index
         ? undefined
         : streak}
+      shouldCelebrate={celebrateWin}
     />
   {/if}
 
