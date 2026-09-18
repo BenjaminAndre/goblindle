@@ -2,6 +2,47 @@
 <p>Toutes les évolutions notables du projet. Format inspiré de
 <a href="https://keepachangelog.com/fr/1.1.0/">Keep a Changelog</a>, la version la plus
 récente en premier.</p>
+<h2>[0.5.0] — 2026-09-18</h2>
+<h3>Ajouté</h3>
+<ul>
+<li><strong>Panneau d&#39;outils.</strong> La barre supérieure regroupe les statistiques, les
+versions et les règles du jeu, avec ouverture et fermeture au clic.</li>
+<li><strong>Statistiques hebdomadaires persistantes.</strong> Les performances sont conservées
+dans la mémoire du navigateur avec sept compteurs indépendants : victoires en
+1, 2, 3, 4, 5 ou 6 essais, et échecs.</li>
+<li><strong>Graphe d&#39;activité par saison.</strong> L&#39;historique est organisé par saisons,
+chacune commençant le premier jeudi de septembre, avec jusqu&#39;à 14 cases par
+ligne et 4 lignes par saison.</li>
+<li><strong>Changelog compilé.</strong> <code>CHANGELOG.md</code> est transformé en fragment HTML pendant
+les étapes <code>predev</code> et <code>prebuild</code>, puis affiché dans le panneau Versions.</li>
+</ul>
+<h3>Modifié</h3>
+<ul>
+<li>Les cases d&#39;activité distinguent désormais quatre états : victoire au premier
+essai, victoire en 2 à 5 essais, victoire au sixième essai et échec.</li>
+<li>Les performances passées affichent toujours sept buckets séparés, sans
+utiliser le code couleur de l&#39;activité.</li>
+<li>Une partie hebdomadaire terminée n&#39;est comptabilisée qu&#39;une seule fois, même
+après un rechargement. Une partie commencée puis abandonnée est enregistrée
+comme échec lorsqu&#39;elle devient une semaine passée.</li>
+<li>Le partage d&#39;un résultat copie maintenant le texte dans le presse-papiers
+avant d&#39;envisager le partage natif, avec solution de repli pour les navigateurs
+ne proposant pas l&#39;API Clipboard.</li>
+<li>L&#39;indication animée du champ de recherche est 50 % plus rapide et son
+expansion au point culminant est doublée. <code>prefers-reduced-motion</code> reste
+respecté.</li>
+</ul>
+<h3>Corrigé</h3>
+<ul>
+<li>Les statistiques et l&#39;activité ne disparaissent plus après le nettoyage des
+sauvegardes de parties hebdomadaires : elles reposent sur une mémoire agrégée
+et un historique idempotent par semaine.</li>
+<li>Les titres Markdown du changelog conservent leur hiérarchie visuelle (<code>#</code>,
+<code>##</code>, etc.), et les listes, liens, paragraphes et éléments inline sont rendus
+correctement.</li>
+<li>Le chargement du changelog fonctionne aussi lorsque l&#39;application est servie
+sous un sous-chemin, notamment sur GitHub Pages.</li>
+</ul>
 <h2>[0.4.0] — 2026-09-17</h2>
 <h3>Ajouté</h3>
 <ul>

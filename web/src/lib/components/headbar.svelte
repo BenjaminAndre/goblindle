@@ -46,10 +46,13 @@
   const ROW_SIZE = 14;
 
   const performanceRows = [
-    { label: "1 essai", color: "bg-[#d6a84f]", index: 0 },
-    { label: "2 à 5 essais", color: "bg-[var(--color-correct)]", index: 1 },
-    { label: "6 essais", color: "bg-[#1f7a43]", index: 2 },
-    { label: "Échec", color: "bg-[var(--color-wrong)]", index: 3 },
+    { label: "1", index: 0 },
+    { label: "2", index: 1 },
+    { label: "3", index: 2 },
+    { label: "4", index: 3 },
+    { label: "5", index: 4 },
+    { label: "6", index: 5 },
+    { label: "💀", index: 6 },
   ];
 
   function getFirstThursdayOfSeptember(year) {
@@ -251,7 +254,7 @@
                   <span>{row.label}</span>
                   <div class="relative h-5 overflow-hidden rounded-full bg-[var(--color-surface)]">
                     <div
-                      class={`absolute inset-y-0 left-0 rounded-full ${playedWeeklyGames > 0 ? row.color : "bg-[var(--color-header)]"}`}
+                      class="absolute inset-y-0 left-0 rounded-full bg-[var(--color-header)]"
                       style={`width: ${playedWeeklyGames > 0 ? (totals[row.index] / maxAttempts) * 100 : 0}%`}
                     ></div>
                   </div>

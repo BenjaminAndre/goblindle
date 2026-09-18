@@ -1,8 +1,44 @@
-# Changelog
+## [0.5.0] — 2026-09-18
 
-Toutes les évolutions notables du projet. Format inspiré de
-[Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), la version la plus
-récente en premier.
+### Ajouté
+
+- **Panneau d'outils.** La barre supérieure regroupe les statistiques, les
+  versions et les règles du jeu, avec ouverture et fermeture au clic.
+- **Statistiques hebdomadaires persistantes.** Les performances sont conservées
+  dans la mémoire du navigateur avec sept compteurs indépendants : victoires en
+  1, 2, 3, 4, 5 ou 6 essais, et échecs.
+- **Graphe d'activité par saison.** L'historique est organisé par saisons,
+  chacune commençant le premier jeudi de septembre, avec jusqu'à 14 cases par
+  ligne et 4 lignes par saison.
+- **Changelog compilé.** `CHANGELOG.md` est transformé en fragment HTML pendant
+  les étapes `predev` et `prebuild`, puis affiché dans le panneau Versions.
+
+### Modifié
+
+- Les cases d'activité distinguent désormais quatre états : victoire au premier
+  essai, victoire en 2 à 5 essais, victoire au sixième essai et échec.
+- Les performances passées affichent toujours sept buckets séparés, sans
+  utiliser le code couleur de l'activité.
+- Une partie hebdomadaire terminée n'est comptabilisée qu'une seule fois, même
+  après un rechargement. Une partie commencée puis abandonnée est enregistrée
+  comme échec lorsqu'elle devient une semaine passée.
+- Le partage d'un résultat copie maintenant le texte dans le presse-papiers
+  avant d'envisager le partage natif, avec solution de repli pour les navigateurs
+  ne proposant pas l'API Clipboard.
+- L'indication animée du champ de recherche est 50 % plus rapide et son
+  expansion au point culminant est doublée. `prefers-reduced-motion` reste
+  respecté.
+
+### Corrigé
+
+- Les statistiques et l'activité ne disparaissent plus après le nettoyage des
+  sauvegardes de parties hebdomadaires : elles reposent sur une mémoire agrégée
+  et un historique idempotent par semaine.
+- Les titres Markdown du changelog conservent leur hiérarchie visuelle (`#`,
+  `##`, etc.), et les listes, liens, paragraphes et éléments inline sont rendus
+  correctement.
+- Le chargement du changelog fonctionne aussi lorsque l'application est servie
+  sous un sous-chemin, notamment sur GitHub Pages.
 
 ## [0.4.0] — 2026-09-17
 

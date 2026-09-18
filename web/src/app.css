@@ -269,3 +269,52 @@ button.guess-cell {
     box-shadow: none;
   }
 }
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  color: var(--color-text);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.markdown-body h1 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+}
+
+.markdown-body h2 {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1.25rem;
+}
+
+.markdown-body h3 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+.markdown-body p,
+.markdown-body ul,
+.markdown-body blockquote {
+  margin: 0 0 0.75rem;
+}
+
+.markdown-body ul {
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.markdown-body a {
+  color: var(--color-focus);
+  text-decoration: underline;
+}

@@ -55,7 +55,7 @@ describe("weekly stats", () => {
     });
   });
 
-  it("groups two through five tries into the second performance bar", () => {
+  it("keeps every winning attempt count in its own performance bucket", () => {
     const storage = createStorage();
     for (let guessCount = 2; guessCount <= 5; guessCount += 1) {
       recordWeeklyResult(
@@ -67,8 +67,8 @@ describe("weekly stats", () => {
 
     expect(summarizeWeeklyPerformance(storage)).toMatchObject({
       playedWeeklyGames: 4,
-      totals: [0, 4, 0, 0],
-      max: 4,
+      totals: [0, 1, 1, 1, 1, 0, 0],
+      max: 1,
     });
   });
 

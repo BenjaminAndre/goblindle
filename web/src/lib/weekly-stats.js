@@ -127,7 +127,10 @@ export function summarizeWeeklyPerformance(storage = globalThis.localStorage) {
   const stats = loadWeeklyStats(storage);
   const totals = [
     stats.weekly_won_1_try,
-    stats.weekly_won_2_try + stats.weekly_won_3_try + stats.weekly_won_4_try + stats.weekly_won_5_try,
+    stats.weekly_won_2_try,
+    stats.weekly_won_3_try,
+    stats.weekly_won_4_try,
+    stats.weekly_won_5_try,
     stats.weekly_won_6_try,
     stats.weekly_fails,
   ];
