@@ -1,8 +1,11 @@
 <script>
   import { onMount } from "svelte";
   import { SvelteDate, SvelteSet } from "svelte/reactivity";
-  import { getCurrentPeriod } from "$lib/schedule";
-  import { summarizeWeeklyPerformance } from "$lib/weekly-stats";
+  import { base } from "$app/paths";
+  import {
+    loadWeeklyStats,
+    summarizeWeeklyPerformance,
+  } from "$lib/weekly-stats";
 
   let isOpen = $state(false);
   let activePanel = $state("activity");
@@ -10,11 +13,10 @@
   let headbarEl = $state();
   let panelEl = $state();
 
-  let currentWeekSeed = $derived(getCurrentPeriod().seed);
   let refreshToken = $state(0);
   let performance = $derived.by(() => {
     refreshToken;
-    return summarizeWeeklyPerformance(undefined, currentWeekSeed);
+    return summarizeWeeklyPerformance();
   });
   let playedWeeklyGames = $derived(performance.playedWeeklyGames);
   let totals = $derived(performance.totals);
@@ -42,6 +44,13 @@
   ];
 
   const ROW_SIZE = 14;
+
+  const performanceRows = [
+    { label: "1 essai", color: "bg-[#d6a84f]", index: 0 },
+    { label: "2 à 5 essais", color: "bg-[var(--color-correct)]", index: 1 },
+    { label: "6 essais", color: "bg-[#1f7a43]", index: 2 },
+    { label: "Échec", color: "bg-[var(--color-wrong)]", index: 3 },
+  ];
 
   function getFirstThursdayOfSeptember(year) {
     const date = new SvelteDate(Date.UTC(year, 8, 1));
@@ -74,41 +83,30 @@
   }
 
   function readWeeklyResult(seed) {
-    if (!globalThis.localStorage) return null;
+    return loadWeeklyStats().periods[seed] ?? null;
+  }
 
-    try {
-      const raw = globalThis.localStorage.getItem(`goblindle_v3_weekly_${seed}`);
-      if (!raw) return null;
-
-      const saved = JSON.parse(raw);
-      if (!saved || typeof saved !== "object") return null;
-
-      if (!saved.isOver) return saved.guesses && saved.guesses.length > 0 ? "wrong" : null;
-      return saved.isWon ? "win" : "wrong";
-    } catch {
-      return null;
-    }
+  function activityColor(result) {
+    if (result === "first_try") return "bg-[#d6a84f]";
+    if (result === "two_to_five") return "bg-[var(--color-correct)]";
+    if (result === "sixth_try") return "bg-[#1f7a43]";
+    if (result === "failed") return "bg-[var(--color-wrong)]";
+    return "bg-[var(--color-header)]";
   }
 
   function buildActivitySeasons() {
     const now = new SvelteDate();
     const seasonYears = new SvelteSet();
+    const weeklyStats = loadWeeklyStats();
 
     const currentSeasonStart = getSeasonStartForDate(now);
     seasonYears.add(currentSeasonStart.getUTCFullYear());
 
-    try {
-      for (let i = 0; i < globalThis.localStorage.length; i++) {
-        const key = globalThis.localStorage.key(i);
-        if (!key || !key.startsWith("goblindle_v3_weekly_")) continue;
-        const seed = key.replace("goblindle_v3_weekly_", "");
-        if (!seed) continue;
-        const date = new SvelteDate(`${seed}T00:00:00Z`);
-        if (Number.isNaN(date.getTime())) continue;
+    for (const seed of Object.keys(weeklyStats.periods)) {
+      const date = new SvelteDate(`${seed}T00:00:00Z`);
+      if (!Number.isNaN(date.getTime())) {
         seasonYears.add(getSeasonStartForDate(date).getUTCFullYear());
       }
-    } catch {
-      // Ignore storage access issues and fall back to the current season.
     }
 
     return [...seasonYears]
@@ -143,7 +141,7 @@
   onMount(() => {
     let disposed = false;
 
-    fetch("/changelog.html")
+    fetch(`${base}/changelog.html`)
       .then((response) => {
         if (!response.ok) throw new Error(`Changelog request failed: ${response.status}`);
         return response.text();
@@ -248,28 +246,18 @@
                   Joue une fois pour débloquer les statistiques.
                 </div>
               {/if}
-              {#each [1, 2, 3, 4, 5, 6] as attempt (attempt)}
+              {#each performanceRows as row (row.label)}
                 <div class="grid grid-cols-[18px_1fr_32px] items-center gap-2 text-[11px] text-[var(--color-text-muted)]">
-                  <span>{attempt}</span>
+                  <span>{row.label}</span>
                   <div class="relative h-5 overflow-hidden rounded-full bg-[var(--color-surface)]">
                     <div
-                      class={`absolute inset-y-0 left-0 rounded-full ${playedWeeklyGames > 0 ? "bg-[var(--color-correct)]" : "bg-[var(--color-header)]"}`}
-                      style={`width: ${playedWeeklyGames > 0 ? (totals[attempt - 1] / maxAttempts) * 100 : 0}%`}
+                      class={`absolute inset-y-0 left-0 rounded-full ${playedWeeklyGames > 0 ? row.color : "bg-[var(--color-header)]"}`}
+                      style={`width: ${playedWeeklyGames > 0 ? (totals[row.index] / maxAttempts) * 100 : 0}%`}
                     ></div>
                   </div>
-                  <span class="text-right text-[var(--color-text)]">{totals[attempt - 1]}</span>
+                  <span class="text-right text-[var(--color-text)]">{totals[row.index]}</span>
                 </div>
               {/each}
-              <div class="grid grid-cols-[18px_1fr_32px] items-center gap-2 text-[11px] text-[var(--color-text-muted)]">
-                <span>💀</span>
-                <div class="relative h-5 overflow-hidden rounded-full bg-[var(--color-surface)]">
-                  <div
-                    class={`absolute inset-y-0 left-0 rounded-full ${playedWeeklyGames > 0 ? "bg-[var(--color-wrong)]" : "bg-[var(--color-header)]"}`}
-                    style={`width: ${playedWeeklyGames > 0 ? (totals[6] / maxAttempts) * 100 : 0}%`}
-                  ></div>
-                </div>
-                <span class="text-right text-[var(--color-text)]">{totals[6]}</span>
-              </div>
             </div>
           </div>
 
@@ -287,7 +275,7 @@
                     <div class="flex gap-1" style={`grid-template-columns: repeat(${Math.min(row.length, ROW_SIZE)}, minmax(0, 1fr));`}>
                       {#each row as square (square.label)}
                         <div
-                          class={`h-3.5 w-3.5 rounded-[2px] ${square.result === null ? "bg-[var(--color-header)]" : square.result === "win" ? "bg-[var(--color-correct)]" : square.result === "early" ? "bg-[var(--color-accent)]" : square.result === "late" ? "bg-[var(--color-header)]" : "bg-[var(--color-wrong)]"}`}
+                          class={`h-3.5 w-3.5 rounded-[2px] ${activityColor(square.result)}`}
                           title={square.label}
                           aria-label={`Semaine du ${square.label}`}
                         ></div>

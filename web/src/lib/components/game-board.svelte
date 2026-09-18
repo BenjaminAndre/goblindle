@@ -25,6 +25,10 @@
     nextStreak,
     saveStreak,
   } from "$lib/streak";
+  import {
+    recordAbandonedWeeklyPeriods,
+    recordWeeklyResult,
+  } from "$lib/weekly-stats";
   import CampaignSearch from "./campaign-search.svelte";
   import GameOver from "./game-over.svelte";
   import GuessGrid from "./guess-grid.svelte";
@@ -94,6 +98,12 @@
       seed,
       getCampaignByName,
     });
+    if (gameMode === "weekly" && game.isOver) {
+      recordWeeklyResult(period.seed, {
+        guessCount: game.guesses.length,
+        isWon: game.isWon,
+      });
+    }
     stats = gameMode === "unlimited" ? loadUnlimitedStats() : null;
   }
 
@@ -106,6 +116,7 @@
       streak = hasAbandonedPeriod(period.seed) ? breakStreak(stored) : stored;
       if (streak !== stored) saveStreak(streak);
 
+      recordAbandonedWeeklyPeriods(period.seed);
       clearExpiredCache(period.seed);
       initGame("weekly");
     } catch (err) {
@@ -134,6 +145,10 @@
     }
 
     if (updated.isOver && updated.mode === "weekly") {
+      recordWeeklyResult(period.seed, {
+        guessCount: updated.guesses.length,
+        isWon: updated.isWon,
+      });
       streak = nextStreak(streak, period.index, updated.isWon);
       saveStreak(streak);
     }

@@ -254,13 +254,13 @@ button.guess-cell {
   }
   50% {
     border-color: var(--color-focus);
-    box-shadow: 0 0 0 4px rgb(194 90 42 / 0.12);
+    box-shadow: 0 0 0 8px rgb(194 90 42 / 0.16);
     transform: translateY(-1px);
   }
 }
 
 .input-idle-hint {
-  animation: idleFieldPulse 2s ease-in-out infinite;
+  animation: idleFieldPulse 1.333s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
