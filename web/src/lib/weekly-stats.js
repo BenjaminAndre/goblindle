@@ -57,6 +57,25 @@ export function loadWeeklyStats(storage = globalThis.localStorage) {
   }
 }
 
+export function resetWeeklyStats(storage = globalThis.localStorage) {
+  const stats = emptyStats();
+  saveWeeklyStats(stats, storage);
+  return stats;
+}
+
+export function setWeeklyCounters(counters = {}, { clearHistory = false } = {}, storage = globalThis.localStorage) {
+  const current = loadWeeklyStats(storage);
+  const stats = emptyStats();
+
+  for (const key of COUNTER_KEYS) {
+    const value = counters[key] ?? (clearHistory ? 0 : current[key]);
+    stats[key] = Number.isInteger(value) && value >= 0 ? value : 0;
+  }
+  stats.periods = clearHistory ? {} : current.periods;
+  saveWeeklyStats(stats, storage);
+  return stats;
+}
+
 function saveWeeklyStats(stats, storage = globalThis.localStorage) {
   try {
     storage?.setItem(STORAGE_KEY, JSON.stringify(stats));
@@ -141,4 +160,67 @@ export function summarizeWeeklyPerformance(storage = globalThis.localStorage) {
     max: Math.max(1, ...totals),
     stats,
   };
+}
+
+function firstThursdayOfSeptember(year) {
+  const date = new Date(Date.UTC(year, 8, 1));
+  date.setUTCDate(date.getUTCDate() + (4 - date.getUTCDay() + 7) % 7);
+  return date;
+}
+
+export function fakeWeeklyHistory({ from = 2026, through = 2029, clear = true } = {}, storage = globalThis.localStorage) {
+  const stats = clear ? emptyStats() : loadWeeklyStats(storage);
+  let weekIndex = 0;
+
+  for (let year = from; year < through; year += 1) {
+    const seasonStart = firstThursdayOfSeptember(year);
+    const seasonEnd = firstThursdayOfSeptember(year + 1);
+
+    for (
+      const date = new Date(seasonStart);
+      date < seasonEnd;
+      date.setUTCDate(date.getUTCDate() + 7)
+    ) {
+      const seed = date.toISOString().slice(0, 10);
+      if (!stats.periods[seed]) {
+        let outcome;
+        let guessCount = 0;
+        if (weekIndex % 20 === 0) {
+          outcome = WEEKLY_OUTCOMES.FIRST_TRY;
+          guessCount = 1;
+        } else if (weekIndex % 11 === 0) {
+          outcome = WEEKLY_OUTCOMES.SIXTH_TRY;
+          guessCount = 6;
+        } else if (weekIndex % 7 === 0) {
+          outcome = WEEKLY_OUTCOMES.FAILED;
+        } else {
+          outcome = WEEKLY_OUTCOMES.TWO_TO_FIVE_TRIES;
+          guessCount = 2 + (weekIndex % 4);
+        }
+
+        stats.periods[seed] = outcome;
+        stats[incrementFor(outcome, guessCount)] += 1;
+      }
+      weekIndex += 1;
+    }
+  }
+
+  saveWeeklyStats(stats, storage);
+  return stats;
+}
+
+export function installWeeklyDataTools() {
+  if (typeof window === "undefined") return null;
+
+  const tools = {
+    read: () => loadWeeklyStats(),
+    reset: () => resetWeeklyStats(),
+    setCounters: (counters, options) => setWeeklyCounters(counters, options),
+    record: (seed, guessCount, isWon = true) =>
+      recordWeeklyResult(seed, { guessCount, isWon }),
+    fakeHistory: (options) => fakeWeeklyHistory(options),
+  };
+
+  window.goblindleWeekly = tools;
+  return tools;
 }

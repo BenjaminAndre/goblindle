@@ -28,4 +28,17 @@
   </header>
   <GameBoard />
   <ContributeBanner />
+  <footer
+    class="mt-auto flex w-full max-w-[900px] items-center justify-center gap-2 border-t border-[var(--color-input-border)] px-4 py-5 text-center text-xs text-[var(--color-text-muted)]"
+  >
+    <span>© 2026 Gobelins &amp; Gremlins</span>
+    <span aria-hidden="true">·</span>
+    <a
+      href="https://discord.com/invite/nHNM6mYxuk"
+      target="_blank"
+      rel="noreferrer"
+      class="transition-colors hover:text-[var(--color-text)]"
+    >Rejoignez-nous sur Discord</a>
+    <span aria-hidden="true">·</span>
+  </footer>
 </main>

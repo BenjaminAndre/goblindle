@@ -65,6 +65,59 @@ Adding or removing a campaign reshuffles the rotation, which changes the current
 answer and resets any game in progress. Edit between Thursdays rather than
 mid-week.
 
+## Console tools for weekly data
+
+After the page has loaded, the browser console exposes `goblindleWeekly` for
+testing local data. Every command writes to the same `localStorage` memory used
+by the statistics panel and refreshes the visible panel automatically.
+
+Inspect the current counters and per-week activity history:
+
+```js
+goblindleWeekly.read()
+```
+
+Reset all weekly counters and activity history:
+
+```js
+goblindleWeekly.reset()
+```
+
+Set counters manually. Missing counters are kept unless `clearHistory: true` is
+passed:
+
+```js
+goblindleWeekly.setCounters({
+  weekly_won_1_try: 2,
+  weekly_won_2_try: 4,
+  weekly_won_3_try: 3,
+  weekly_won_4_try: 2,
+  weekly_won_5_try: 1,
+  weekly_won_6_try: 1,
+  weekly_fails: 3,
+}, { clearHistory: true })
+```
+
+Record one result manually. The seed is the Thursday date in `YYYY-MM-DD`
+format; the result is idempotent for an already recorded week:
+
+```js
+goblindleWeekly.record("2026-09-17", 3, true)  // win in 3
+goblindleWeekly.record("2026-09-24", 6, false) // failure
+```
+
+Generate a deterministic, credible weekly history from the 2026 season through
+the beginning of the 2029 season. It clears the previous weekly memory first;
+future weeks are stored for testing but remain hidden from the activity graph
+until their dates have passed:
+
+```js
+goblindleWeekly.fakeHistory({ from: 2026, through: 2029 })
+```
+
+Use `{ clear: false }` to add the generated weeks without replacing existing
+history.
+
 ## Logo
 
 `logo_gg.png` at the repo root is the master copy of the club badge — 700×691,
@@ -85,10 +138,8 @@ every campaign in `campaigns.json`, add a matching entry to
 
 ## Roadmap
 
-Here are some ideas for coming versions : 
-* Weekly stats. Games played, win rate, guess distribution, best streak ever.
-* A second game mode : emojis (also both weekly and unlimited). Guess a game (D&D5e, Fate, Dernière Apocalypse, etc) based on 4 emojis that reveal one after each failed try or all when successfully guessed. If I have the data, I may choose to show how many times it was run as an anecdote (number of campaigns separatly from one shots)
-* A footer with all legally needed data and also contact info and so on
+Ideas for later versions include a second game mode based on emojis and further
+campaign-specific visualisations.
 
 Naturally, all correct data from the club past, with illustrations.
 

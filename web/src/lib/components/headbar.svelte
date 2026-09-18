@@ -180,8 +180,19 @@
       }
     }
 
+    function handleKeyDown(event) {
+      if (isOpen && event.key === "Escape") {
+        event.preventDefault();
+        closePanel();
+      }
+    }
+
     document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   });
 
   function togglePanel(id) {

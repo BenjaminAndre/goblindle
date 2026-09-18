@@ -39,6 +39,8 @@
   let game = $state(null);
   let loading = $state(true);
   let error = $state(null);
+  let loadingPercent = $state(0);
+  let loadingPhase = $state("download");
   let stats = $state(null);
   let period = $state(null);
   let streak = $state(null);
@@ -109,7 +111,12 @@
 
   onMount(async () => {
     try {
-      await loadCampaigns();
+      await loadCampaigns({
+        onProgress: ({ percent, phase }) => {
+          loadingPercent = percent ?? Math.min(95, loadingPercent + 2);
+          loadingPhase = phase;
+        },
+      });
       period = getCurrentPeriod();
 
       const stored = loadStreak();
@@ -161,9 +168,25 @@
 </script>
 
 {#if loading}
-  <p class="text-center text-[var(--color-text-muted)] py-8">
-    Chargement des campagnes...
-  </p>
+  <div class="w-full max-w-[400px] px-4 py-8 mx-auto text-center" aria-live="polite">
+    <p class="mb-3 text-[var(--color-text-muted)]">
+      {loadingPhase === "validation" ? "Préparation des campagnes..." : "Chargement des campagnes..."}
+    </p>
+    <div
+      class="h-2 overflow-hidden rounded-full bg-[var(--color-surface)]"
+      role="progressbar"
+      aria-label="Progression du chargement des campagnes"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow={loadingPercent}
+    >
+      <div
+        class="h-full rounded-full bg-[var(--color-accent)] transition-[width] duration-150"
+        style={`width: ${loadingPercent}%`}
+      ></div>
+    </div>
+    <p class="mt-2 text-xs text-[var(--color-text-muted)]">{Math.round(loadingPercent)} %</p>
+  </div>
 {:else if error}
   <p class="text-center text-[var(--color-wrong)] py-8">
     Impossible de charger les campagnes. Rechargez la page.

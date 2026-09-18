@@ -1,3 +1,22 @@
+## [0.5.1] — 2026-09-18
+
+### Ajouté
+
+- **Outils console pour les données hebdomadaires.** `goblindleWeekly` permet
+  d'inspecter, réinitialiser et régler les compteurs, d'enregistrer un résultat
+  par seed et de générer un historique crédible de 2026 au début de 2029.
+- **Barre de progression du chargement.** Le chargement des campagnes indique
+  séparément le téléchargement et la préparation des données, avec un suivi des
+  octets lorsque le navigateur expose la taille du flux.
+- **Métadonnées de partage.** Le titre, la description et le logo sont exposés
+  via Open Graph et Twitter Cards pour les liens partagés.
+
+### Modifié
+
+- Le panneau supérieur peut maintenant être fermé avec la touche `Échap`.
+- Le README documente les commandes permettant de manipuler la mémoire locale
+  sans modifier directement les clés `localStorage`.
+
 ## [0.5.0] — 2026-09-18
 
 ### Ajouté
