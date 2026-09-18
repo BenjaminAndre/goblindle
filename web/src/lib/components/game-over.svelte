@@ -1,6 +1,7 @@
 <script>
   import CampaignAvatar from "./campaign-avatar.svelte";
   import Countdown from "./countdown.svelte";
+  import { copyTextToClipboard } from "$lib/copy-text";
   import { STREAK_RULE, streakMessage } from "$lib/streak";
 
   /** Win/loss message, with a countdown in weekly mode and a button in unlimited */
@@ -46,28 +47,7 @@
     const text = shareText;
 
     try {
-      if (typeof navigator !== "undefined" && navigator.share) {
-        await navigator.share({
-          title: "Goblindle",
-          text,
-        });
-        return;
-      }
-    } catch {
-      // Ignore unsupported share errors.
-    }
-
-    try {
-      if (typeof navigator !== "undefined" && navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      }
+      await copyTextToClipboard(text);
       copied = true;
       window.setTimeout(() => {
         copied = false;

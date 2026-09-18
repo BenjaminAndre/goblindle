@@ -360,5 +360,28 @@
     "deaths": {
       "value": 0
     }
+  },
+  {
+    "campaign": {
+      "value": "Valentin Underveil"
+    },
+    "gm": {
+      "value": "Valentin"
+    },
+    "game": {
+      "value": "The Underveil"
+    },
+    "year": {
+      "value": 2026
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 0
+    },
+    "deaths": {
+      "value": 0
+    }
   }
 ]

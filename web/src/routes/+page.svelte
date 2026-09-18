@@ -2,6 +2,7 @@
   import { asset } from "$app/paths";
   import ContributeBanner from "$lib/components/contribute-banner.svelte";
   import GameBoard from "$lib/components/game-board.svelte";
+  import Headbar from "$lib/components/headbar.svelte";
 </script>
 
 <main class="flex flex-col items-center min-h-screen">
@@ -23,6 +24,7 @@
         Gob<span class="text-[var(--color-accent)]">l</span>indle
       </h1>
     </div>
+    <Headbar />
   </header>
   <GameBoard />
   <ContributeBanner />
