@@ -38,7 +38,6 @@
       target="_blank"
       rel="noreferrer"
       class="transition-colors hover:text-[var(--color-text)]"
-    >Rejoignez-nous sur Discord</a>
-    <span aria-hidden="true">·</span>
+    >Rejoins-nous sur Discord</a>
   </footer>
 </main>

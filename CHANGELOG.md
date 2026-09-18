@@ -10,12 +10,18 @@
   octets lorsque le navigateur expose la taille du flux.
 - **Métadonnées de partage.** Le titre, la description et le logo sont exposés
   via Open Graph et Twitter Cards pour les liens partagés.
+- **Célébration de victoire.** Une pluie de confettis légère se déclenche après
+  une victoire, en mode Hebdomadaire comme en mode Illimité.
 
 ### Modifié
 
 - Le panneau supérieur peut maintenant être fermé avec la touche `Échap`.
 - Le README documente les commandes permettant de manipuler la mémoire locale
   sans modifier directement les clés `localStorage`.
+- Le champ de recherche possède désormais un label accessible, sans modifier
+  son apparence visuelle.
+- La roadmap a été retirée du README : les prochaines idées seront ajoutées
+  lorsqu’elles seront réellement planifiées.
 
 ## [0.5.0] — 2026-09-18
 

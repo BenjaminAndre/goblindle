@@ -1,4 +1,6 @@
 <script>
+  import { onMount } from "svelte";
+  import confetti from "canvas-confetti";
   import CampaignAvatar from "./campaign-avatar.svelte";
   import Countdown from "./countdown.svelte";
   import { copyTextToClipboard } from "$lib/copy-text";
@@ -11,6 +13,37 @@
   // earlier period than the one just played.
   let showStreak = $derived(Boolean(streak));
   let copied = $state(false);
+
+  onMount(() => {
+    if (!isWon) return;
+
+    const end = Date.now() + 900;
+    let animationFrame;
+
+    function celebrate() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.68 },
+        colors: ["#d6a84f", "#4ecb71", "#f2e9e2"],
+        disableForReducedMotion: true,
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.68 },
+        colors: ["#d6a84f", "#4ecb71", "#f2e9e2"],
+        disableForReducedMotion: true,
+      });
+
+      if (Date.now() < end) animationFrame = requestAnimationFrame(celebrate);
+    }
+
+    celebrate();
+    return () => cancelAnimationFrame(animationFrame);
+  });
 
   let shareText = $derived.by(() => {
     const shareUrl =

@@ -74,8 +74,10 @@
 </script>
 
 <div class="relative w-full max-w-[400px] mx-auto px-4">
+  <label for="campaign-search" class="sr-only">Nom de la campagne</label>
   <input
     bind:this={inputEl}
+    id="campaign-search"
     type="text"
     role="combobox"
     aria-expanded={isVisible}

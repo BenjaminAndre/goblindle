@@ -136,13 +136,6 @@ The guessed attributes are listed once, in
 every campaign in `campaigns.json`, add a matching entry to
 `CLASSIC_ATTRIBUTES`, and the grid column follows automatically.
 
-## Roadmap
-
-Ideas for later versions include a second game mode based on emojis and further
-campaign-specific visualisations.
-
-Naturally, all correct data from the club past, with illustrations.
-
 ## License
 
 Apache-2.0 — see [LICENSE](./web/LICENSE).

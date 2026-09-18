@@ -116,8 +116,22 @@
       .sort((left, right) => left - right)
       .map((year) => {
         const seasonStart = getFirstThursdayOfSeptember(year);
-        const seasonEnd = new SvelteDate(Date.UTC(year + 1, 8, 1));
-        const endDate = new SvelteDate(Math.min(now.getTime(), seasonEnd.getTime()));
+        const seasonEnd = getFirstThursdayOfSeptember(year + 1);
+        let latestEncodedDate =
+          year === currentSeasonStart.getUTCFullYear() ? now : seasonEnd;
+
+        for (const seed of Object.keys(weeklyStats.periods)) {
+          const encodedDate = new SvelteDate(`${seed}T00:00:00Z`);
+          if (
+            !Number.isNaN(encodedDate.getTime()) &&
+            getSeasonStartForDate(encodedDate).getUTCFullYear() === year &&
+            encodedDate > latestEncodedDate
+          ) {
+            latestEncodedDate = encodedDate;
+          }
+        }
+
+        const endDate = new SvelteDate(latestEncodedDate);
         const weeks = [];
 
         for (let cursor = new SvelteDate(seasonStart); cursor <= endDate; cursor.setUTCDate(cursor.getUTCDate() + 7)) {

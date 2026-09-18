@@ -32,5 +32,8 @@
     "@babel/core": "^7.29.7",
     "js-yaml": "^4.3.0",
     "postcss": ">=8.5.16"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.4"
   }
 }
