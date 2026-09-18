@@ -10,8 +10,12 @@ function escapeHtml(value) {
   return value.replace(/[&<>"']/g, (char) => ESCAPED[char]);
 }
 
-function escapeAttribute(value) {
-  return escapeHtml(value);
+function renderInlineMarkdown(value) {
+  let html = escapeHtml(value);
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+  html = html.replace(/\[(.+?)\]\((https?:[^)]+)\)/g, '<a href="$2">$1</a>');
+  return html;
 }
 
 export function markdownToHtml(markdown) {
@@ -36,8 +40,8 @@ export function markdownToHtml(markdown) {
       flushList();
       const match = line.match(/^(#{1,6})\s+(.*)$/);
       const level = match[1].length;
-      const content = match[2].trim();
-      html.push(`<h${level}>${escapeHtml(content)}</h${level}>`);
+      const content = renderInlineMarkdown(match[2].trim());
+      html.push(`<h${level}>${content}</h${level}>`);
       continue;
     }
 
@@ -46,27 +50,27 @@ export function markdownToHtml(markdown) {
         html.push("<ul>");
         inList = true;
       }
-      html.push(`<li>${escapeHtml(line.replace(/^[-*]\s+/, ""))}</li>`);
+      html.push(`<li>${renderInlineMarkdown(line.replace(/^[-*]\s+/, ""))}</li>`);
       continue;
     }
 
     if (/^>\s+/.test(line)) {
       flushList();
-      html.push(`<blockquote>${escapeHtml(line.replace(/^>\s+/, ""))}</blockquote>`);
+      html.push(`<blockquote>${renderInlineMarkdown(line.replace(/^>\s+/, ""))}</blockquote>`);
       continue;
     }
 
     if (/^\[.*\]\(.*\)$/.test(line)) {
       flushList();
       const match = line.match(/^\[(.*)\]\((.*)\)$/);
-      const text = match[1];
-      const href = escapeAttribute(match[2]);
-      html.push(`<p><a href="${href}">${escapeHtml(text)}</a></p>`);
+      const text = renderInlineMarkdown(match[1]);
+      const href = escapeHtml(match[2]);
+      html.push(`<p><a href="${href}">${text}</a></p>`);
       continue;
     }
 
     flushList();
-    html.push(`<p>${escapeHtml(line)}</p>`);
+    html.push(`<p>${renderInlineMarkdown(line)}</p>`);
   }
 
   flushList();
