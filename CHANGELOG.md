@@ -1,3 +1,36 @@
+## [0.5.4] — 2026-09-25
+
+### Corrigé
+
+- **Le changelog était corrompu.** Le titre `[0.5.2]` apparaissait deux fois, et
+  le contenu réel de la 0.4.0 — partage du résultat, limite de 6 essais en
+  Illimité — se trouvait sous le second, placé après la 0.5.0 et donc hors
+  ordre. La 0.4.0 avait en outre perdu ses sous-titres `Ajouté` / `Modifié` /
+  `Corrigé`, et deux de ses puces avaient perdu leur milieu de phrase. Les
+  sections sont remises dans l'ordre et les puces reconstituées à partir des
+  fragments survivants.
+
+### Supprimé
+
+- `greenberg_src.png`, le PNG source de 437 Ko à la racine du dépôt. Seule la
+  version servie est conservée : `web/static/img/campaigns/greenberg.jpg`,
+  26 Ko.
+
+## [0.5.3] — 2026-09-25
+
+### Ajouté
+
+- **Illustration pour « L'héritage Greenberg ».** Première campagne à utiliser
+  l'emplacement d'image prévu depuis la v0.1 ; les autres gardent leur vignette
+  d'initiales. Le fichier est servi depuis `web/static/img/campaigns/`, en JPEG
+  320 px de large : la vignette s'affiche au maximum en 80 px, et le PNG
+  d'origine pesait 437 Ko pour un rendu identique.
+
+### Corrigé
+
+- La version de `package.json` était restée à 0.3.0 alors que le changelog était
+  passé en 0.5.2. Les deux sont réalignées.
+
 ## [0.5.2] — 2026-09-18
 
 ### Modifié
@@ -83,27 +116,14 @@
 
 ## [0.4.0] — 2026-09-17
 
+### Ajouté
+
 - **Hint d'interaction sur le champ de recherche.** Quand aucune tentative n'a
-  qu'il doit être cliqué avant de taper une campagne.
-  copier ou partager son score directement dans un message Discord ou sur son
-
-## [0.5.2] — 2026-09-18
-
-### Modifié
-
-- Le graphe d'activité affiche les semaines futures lorsqu'elles sont présentes
-  dans l'historique local, afin de faciliter la vérification des saisons à venir.
-  Sans données futures, il conserve des cases vides uniquement jusqu'à la date
-  courante.
-- Le chargement des campagnes revient à un simple message texte : la barre de
-  progression estimée n'apportait pas d'information fiable pour ce fichier court.
-
-### Corrigé
-
-- Les confettis de victoire se déclenchent uniquement après une victoire obtenue
-  pendant la partie en cours ; ils ne réapparaissent plus lors d'un
-  rechargement d'une victoire déjà enregistrée.
-  système de partage natif, avec une grille d'émojis de résultat.
+  encore été faite, une indication animée signale qu'il doit être cliqué avant
+  de taper une campagne.
+- **Partage du résultat.** Un bouton permet de copier ou partager son score
+  directement dans un message Discord ou sur son système de partage natif, avec
+  une grille d'émojis de résultat.
 
 ### Modifié
 

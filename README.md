@@ -39,6 +39,9 @@ optional entirely:
   not an omitted field.
 - Optional illustrations go in `web/static/img/campaigns/`, and `image.value` is
   just the filename. Campaigns without one get a tile showing their initials.
+  The tile renders at 40 px in the grid and 80 px on the reveal, so **320 px
+  wide is plenty**; save painterly art as JPEG rather than PNG, which is worth
+  roughly a 90 % saving at identical quality.
 - `notes` show up as a "?" bubble on that field's cell, one anecdote picked at
   random each time it opens. A field with no notes gets no bubble, so the
   affordance never promises something that isn't there. Write one note per

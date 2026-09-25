@@ -221,6 +221,9 @@
     "campaign": {
       "value": "L'héritage Greenberg"
     },
+    "image": {
+      "value": "greenberg.jpg"
+    },
     "gm": {
       "value": "Léo"
     },
