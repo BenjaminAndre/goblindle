@@ -1,6 +1,55 @@
 [
   {
     "campaign": {
+      "value": "Le Carnaval de Sorcelume",
+    },
+    "gm": {
+      "value": "Florine"
+    },
+    "game": {
+      "value": "Donjons & Dragons 5e"
+    },
+    "year": {
+      "value": 2023,
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 2,
+    },
+    "deaths": {
+      "value": 4
+    }
+  },
+  {
+    "campaign": {
+      "value": "Ango",
+    },
+    "gm": {
+      "value": "Florine"
+    },
+    "game": {
+      "value": "Donjons & Dragons 5e"
+    },
+    "year": {
+      "value": 2024,
+    },
+    "pj_max": {
+      "value": 5
+    },
+    "duration": {
+      "value": 0,
+      "notes": [
+        "Un quadri, c'est moins d'un an."
+      ]
+    },
+    "deaths": {
+      "value": 0
+    }
+  },
+  {
+    "campaign": {
       "value": "Dorian D&D",
       "notes": [
         "Seulement de mai à juin, pour complèter car celle d'Arthur s'est finie plus tôt que prévu. "
